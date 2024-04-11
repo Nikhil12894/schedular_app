@@ -90,6 +90,9 @@ class SchedularServiceTest {
 
         Boolean cancelResult = schedularServiceUnderTest.cancelTask("taskId1");
         assertThat(cancelResult).isTrue();
+
+        // Verify that the task status is updated to cancelled
+        assertThat(demoTask.getStatus()).isEqualTo(TaskStatus.CANCELLED);
     }
 
 }
