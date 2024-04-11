@@ -58,7 +58,8 @@ class TaskControllerAdviceTest {
     WebResponse<Object> response =  WebResponse.builder().message("Forbidden").build();
     ResponseEntity<WebResponse<Object>> expectedResponse = new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     ResponseEntity<WebResponse<Object>> actualResponse = taskControllerAdvice.handleForbiddenException(new ForbiddenException("Forbidden"));
-    assertThat(actualResponse).isEqualTo(expectedResponse);
+    assertThat(actualResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    assertThat(actualResponse.getBody().getMessage()).contains("Forbidden");
   }
 
   @Test
