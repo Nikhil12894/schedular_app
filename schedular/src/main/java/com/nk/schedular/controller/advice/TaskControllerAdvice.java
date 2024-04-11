@@ -51,6 +51,7 @@ public class TaskControllerAdvice {
     public ResponseEntity<WebResponse<Object>> handleBadRequestFormatException(BadRequestException ex) {
         WebResponse<Object> response = new WebResponse<>();
         response.setMessage(ex.getMessage());
+        log.warn("Bad request received: {}", ex.getMessage());
         if (ObjectUtils.isEmpty(ex.getErrors())) {
             response.setErrors(ex.getErrors());
         }
