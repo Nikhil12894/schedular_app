@@ -7,18 +7,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
+@Slf4j
 @Entity
 @Table(name = "DEMO_TASK",uniqueConstraints = @UniqueConstraint(columnNames = "TASK_ID"))
 public class DemoTask extends Task<String>{
     
     @Override
     public void run() {
-        System.out.println(this.getData());
+        log.info(this.getData());
     }
 
     /**

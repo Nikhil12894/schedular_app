@@ -16,8 +16,8 @@ import com.nk.schedular.dto.TaskDTO;
 import com.nk.schedular.dto.TaskList;
 import com.nk.schedular.dto.TaskRequest;
 import com.nk.schedular.dto.TaskShortBy;
-import com.nk.schedular.dto.UpdateTaskRequest;
 import com.nk.schedular.exception.BadRequestException;
+import com.nk.schedular.exception.DuplicateTransactionException;
 import com.nk.schedular.exception.InternalServerException;
 import com.nk.schedular.model.DemoTask;
 import com.nk.schedular.model.Schedule;
@@ -43,19 +43,7 @@ public class TaskService {
      * @return       the TaskDTO representing the saved task
      */
     public TaskDTO saveTask(TaskRequest task) {
-        ScheduleRequest scheduleRequest = task.getSchedule();
-        DemoTask demoTaskToSave = DemoTask.builder()
-        .taskId(task.getTaskId())
-        .description(task.getDescription())
-        .isSchedularEnabled(task.getIsSchedularEnabled())
-        .schedule(
-            Schedule.builder()
-            .id(scheduleRequest.getId())
-            .scheduleId(scheduleRequest.getScheduleId())
-            .cronSchedule(scheduleRequest.getCronSchedule())
-            .build()
-            )
-        .build();
+        DemoTask demoTaskToSave = this.buiDemoTask(task);
         this.setAuditFields(demoTaskToSave);
         DemoTask savedTask = this.taskRepo.save(demoTaskToSave);
         return mapDemoTaskToTaskDTO(savedTask);
@@ -90,12 +78,22 @@ public class TaskService {
     /**
      * Update a task with the given task details.
      *
-     * @param  task   the UpdateTaskRequest containing the details to update the task
+     * @param  task   the TaskRequest containing the details to update the task
      * @return       the TaskDTO representing the updated task
      */
-    public TaskDTO updateTask(UpdateTaskRequest task) {
+    public TaskDTO updateTask(TaskRequest task) {
+        DemoTask demoTaskToUpdate = this.buiDemoTask(task);
+        this.setAuditFields(demoTaskToUpdate);
+        DemoTask updatedTask = this.taskRepo.save(demoTaskToUpdate);
+        return mapDemoTaskToTaskDTO(updatedTask);
+    }
+
+    private DemoTask buiDemoTask(TaskRequest task) {
+        if(Boolean.TRUE.equals(taskRepo.existsByTaskId(task.getTaskId()))) {
+            throw new DuplicateTransactionException(ApiConstants.INVALID_TASK_ID);
+        }
         ScheduleRequest scheduleRequest = task.getSchedule();
-        DemoTask demoTaskToUpdate = DemoTask.builder()
+        return DemoTask.builder()
         .id(task.getId())
         .taskId(task.getTaskId())
         .description(task.getDescription())
@@ -108,11 +106,8 @@ public class TaskService {
             .build()
             )
         .build();
-        this.setAuditFields(demoTaskToUpdate);
-        DemoTask updatedTask = this.taskRepo.save(demoTaskToUpdate);
-        return mapDemoTaskToTaskDTO(updatedTask);
     }
-
+    
     /**
      * Deletes a task with the given ID.
      *
@@ -336,19 +331,19 @@ public class TaskService {
     /**
      * Maps a DemoTask object to a TaskDTO object.
      *
-     * @param  DemoTask   the DemoTask object to be mapped
+     * @param  demoTask   the DemoTask object to be mapped
      * @return           the mapped TaskDTO object
      */
-    private TaskDTO mapDemoTaskToTaskDTO(DemoTask DemoTask) {
+    private TaskDTO mapDemoTaskToTaskDTO(DemoTask demoTask) {
         return TaskDTO.builder()
-                .id(DemoTask.getId())
-                .description(DemoTask.getDescription())
-                .isSchedularEnabled(DemoTask.getIsSchedularEnabled())
-                .schedule(mapScheduleToDTO(DemoTask.getSchedule()))
-                .createdAt(DemoTask.getCreatedAt())
-                .createdBy(DemoTask.getCreatedBy())
-                .lastUpdatedAt(DemoTask.getLastUpdatedAt())
-                .lastUpdatedBy(DemoTask.getLastUpdatedBy())
+                .id(demoTask.getId())
+                .description(demoTask.getDescription())
+                .isSchedularEnabled(demoTask.getIsSchedularEnabled())
+                .schedule(mapScheduleToDTO(demoTask.getSchedule()))
+                .createdAt(demoTask.getCreatedAt())
+                .createdBy(demoTask.getCreatedBy())
+                .lastUpdatedAt(demoTask.getLastUpdatedAt())
+                .lastUpdatedBy(demoTask.getLastUpdatedBy())
                 .build();
     }
 

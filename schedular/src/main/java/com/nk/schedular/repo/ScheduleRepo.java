@@ -4,11 +4,14 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 
 import com.nk.schedular.model.Schedule;
+
+import jakarta.transaction.Transactional;
 
 public interface ScheduleRepo extends ListCrudRepository<Schedule, Long> , ListPagingAndSortingRepository<Schedule, Long> {
 

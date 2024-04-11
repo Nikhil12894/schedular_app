@@ -27,15 +27,10 @@ public class DBOperationRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
-        try {
-            setupInitialData();
-        } catch (Exception e) {
-            log.error("Error setting up initial data: {}", e.getMessage());
-            throw e;
-        }
+        setupInitialData();
     }
 
-    private void setupInitialData() throws Exception {
+    private void setupInitialData(){
         ScheduleRequest schedule = ScheduleRequest.builder().scheduleId("EVERY_10_SECONDS").cronSchedule("0/10 * * ? * *").build();
         ScheduleDTO savedSchedule = scheduleService.saveSchedule(schedule);
         taskService.saveTask(

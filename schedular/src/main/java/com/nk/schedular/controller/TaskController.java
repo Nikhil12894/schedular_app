@@ -20,7 +20,6 @@ import com.nk.schedular.dto.TaskDTO;
 import com.nk.schedular.dto.TaskList;
 import com.nk.schedular.dto.TaskRequest;
 import com.nk.schedular.dto.TaskShortBy;
-import com.nk.schedular.dto.UpdateTaskRequest;
 import com.nk.schedular.dto.WebResponse;
 import com.nk.schedular.service.SchedularService;
 import com.nk.schedular.service.TaskService;
@@ -125,7 +124,7 @@ public class TaskController {
      */
     @Operation(summary = "Update a Task")
     @PutMapping
-    public ResponseEntity<WebResponse<TaskDTO>> updateTask(@RequestBody UpdateTaskRequest taskRequest) {
+    public ResponseEntity<WebResponse<TaskDTO>> updateTask(@RequestBody TaskRequest taskRequest) {
         TaskDTO taskDTO = taskService.updateTask(taskRequest);
         WebResponse<TaskDTO> response = new WebResponse<>();
         response.setData(taskDTO);

@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Task request object", requiredMode = Schema.RequiredMode.REQUIRED)
 public class TaskRequest {
 
+    @Schema(description = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long id;
+
     @Schema(description = "task id", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("task_id")
     private String taskId;

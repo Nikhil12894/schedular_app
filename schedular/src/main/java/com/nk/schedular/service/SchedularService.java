@@ -14,8 +14,6 @@ import com.nk.schedular.repo.TaskRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.TimeUnit;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -47,16 +45,11 @@ public class SchedularService {
      */
     public boolean cancelTask(String taskId){
         try {
-            Job job = this.scheduler.cancel(taskId).toCompletableFuture().get(1, TimeUnit.SECONDS);
-            return job.status().equals(JobStatus.DONE);
-        } catch (TimeoutException e) {
+            this.scheduler.cancel(taskId);
+        } catch (IllegalArgumentException e) {
             throw new BadRequestException("Task cancellation timed out: " + taskId);
-        } catch (ExecutionException e) {
-            throw new BadRequestException("Error during task cancellation: " + e.getCause().getMessage());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new BadRequestException("Task cancellation was interrupted");
         }
+        return true;
     }
 
 }

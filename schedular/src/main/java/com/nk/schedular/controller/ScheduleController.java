@@ -56,9 +56,6 @@ public class ScheduleController {
     @Operation(summary = "Update schedule")
     @PutMapping
     public ResponseEntity<WebResponse<ScheduleDTO>> updateSchedule(@RequestBody ScheduleRequest schedule) {
-        if (!scheduleService.exists(schedule.getScheduleId())) {
-            throw new NotFoundException("Schedule not found");
-        }
         ScheduleDTO updatedSchedule = scheduleService.updateSchedule(schedule);
         WebResponse<ScheduleDTO> response = new WebResponse<>();
         response.setData(updatedSchedule);
@@ -76,9 +73,6 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<WebResponse<ScheduleDTO>> getSchedule(
             @RequestParam(value = ApiConstants.SCHEDULE_ID, required = true) String scheduleId) {
-        if (scheduleId == null || scheduleId.isEmpty()) {
-            throw new BadRequestException("Invalid schedule ID");
-        }
         ScheduleDTO scheduleDTO = scheduleService.getSchedule(scheduleId);
         WebResponse<ScheduleDTO> response = new WebResponse<>();
         response.setData(scheduleDTO);
