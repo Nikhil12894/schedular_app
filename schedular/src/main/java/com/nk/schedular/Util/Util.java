@@ -29,10 +29,10 @@ public abstract class Util {
             throw new BadRequestException("Page size cannot be less than 1");
         }
         if(null == sort) {
-            throw new BadRequestException("Invalid sort parameter, must be ASC or DESC");
+            throw new BadRequestException("Invalid sort parameter: " + sort + ". Must be 'ASC' or 'DESC'.");
         }
         if(null == sortBy) {
-            throw new BadRequestException("Invalid sortby parameter");
+            throw new BadRequestException("Invalid sortBy parameter: " + sortBy + ". Must be a valid field name.");
         }
         Pageable pageable = null;
         if(sort.equals(ApiConstants.NO_SORT) && sortBy.equals(ApiConstants.NO_SORT)) {
