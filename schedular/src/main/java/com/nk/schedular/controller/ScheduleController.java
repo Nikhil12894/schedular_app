@@ -73,6 +73,9 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<WebResponse<ScheduleDTO>> getSchedule(
             @RequestParam(value = ApiConstants.SCHEDULE_ID, required = true) String scheduleId) {
+        if (scheduleId == null || scheduleId.isEmpty()) {
+            throw new BadRequestException("Invalid schedule ID");
+        }
         ScheduleDTO scheduleDTO = scheduleService.getSchedule(scheduleId);
         WebResponse<ScheduleDTO> response = new WebResponse<>();
         response.setData(scheduleDTO);
