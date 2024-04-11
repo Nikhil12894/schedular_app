@@ -90,6 +90,7 @@ public class TaskControllerAdvice {
     @ExceptionHandler(MethodNotAllowedException.class)
     @ResponseBody
     public ResponseEntity<WebResponse<Object>> handleMethodNotAllowedException(MethodNotAllowedException ex) {
+        // This exception is thrown when an HTTP method is used that is not allowed for the endpoint
         WebResponse<Object> response = new WebResponse<>();
         response.setMessage(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
