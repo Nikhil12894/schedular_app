@@ -64,5 +64,7 @@ public interface TaskRepo extends ListCrudRepository<DemoTask, Long>, ListPaging
     @Query("select t from DemoTask t where t.taskId in ?1")
     Page<DemoTask> findAllTaskWithTaskIds(Pageable pageable, List<String> taskIds);
 
+    boolean existsByTaskId(String taskId);
+
 
 }
