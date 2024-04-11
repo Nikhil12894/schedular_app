@@ -49,8 +49,13 @@ public class SchedularService {
         try {
             Job job = this.scheduler.cancel(taskId).toCompletableFuture().get(1, TimeUnit.SECONDS);
             return job.status().equals(JobStatus.DONE);
-        } catch (Exception e) {
-            throw new BadRequestException(ApiConstants.INVALID_TASK_ID);
+        } catch (TimeoutException e) {
+            throw new BadRequestException("Task cancellation timed out: " + taskId);
+        } catch (ExecutionException e) {
+            throw new BadRequestException("Error during task cancellation: " + e.getCause().getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BadRequestException("Task cancellation was interrupted");
         }
     }
 
