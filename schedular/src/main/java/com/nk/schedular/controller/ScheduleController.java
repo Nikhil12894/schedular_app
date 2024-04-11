@@ -56,6 +56,9 @@ public class ScheduleController {
     @Operation(summary = "Update schedule")
     @PutMapping
     public ResponseEntity<WebResponse<ScheduleDTO>> updateSchedule(@RequestBody ScheduleRequest schedule) {
+        if (!scheduleService.exists(schedule.getScheduleId())) {
+            throw new NotFoundException("Schedule not found");
+        }
         ScheduleDTO updatedSchedule = scheduleService.updateSchedule(schedule);
         WebResponse<ScheduleDTO> response = new WebResponse<>();
         response.setData(updatedSchedule);
