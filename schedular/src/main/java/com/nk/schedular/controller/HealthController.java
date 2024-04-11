@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     /**
-     * Rout for readiness probe
+     * Route for readiness probe
      * @return httpStatus ok
      */
     @GetMapping("/healthz")
