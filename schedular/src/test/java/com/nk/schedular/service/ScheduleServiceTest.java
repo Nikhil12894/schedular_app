@@ -40,8 +40,6 @@ class ScheduleServiceTest {
     private ScheduleService scheduleServiceUnderTest;
     private ScheduleRequest scheduleRequest;
     private ScheduleDTO expectedResult;
-    private Schedule scheduleToReturn;
-    private Schedule scheduleToSave;
    
     @BeforeEach
     void setUp() {
@@ -60,21 +58,6 @@ class ScheduleServiceTest {
                             .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                             .lastUpdatedBy(0L)
                             .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                            .build();
-            scheduleToReturn = Schedule.builder()
-                            .id(0L)
-                            .scheduleId("scheduleId")
-                            .cronSchedule("0/10 * * ? * *")
-                            .createdBy(0L)
-                            .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                            .lastUpdatedBy(0L)
-                            .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                            .build();
-            scheduleToSave = Schedule.builder()
-                            .scheduleId("scheduleId")
-                            .cronSchedule("0/10 * * ? * *")
-                            .createdBy(0L)
-                            .lastUpdatedBy(0L)
                             .build();
     }
 
