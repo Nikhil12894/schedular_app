@@ -66,6 +66,8 @@ public class TaskControllerAdvice {
     public ResponseEntity<WebResponse<Object>> handleInternalServerException(InternalServerException ex) {
         WebResponse<Object> response = new WebResponse<>();
         response.setMessage(ex.getMessage());
+        // Consider integrating with an alerting system to notify administrators
+        alertAdmin(ex);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
