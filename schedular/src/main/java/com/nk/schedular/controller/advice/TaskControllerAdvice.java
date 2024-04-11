@@ -26,8 +26,10 @@ import com.nk.schedular.exception.UnAuthorizedException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
+@Slf4j
 public class TaskControllerAdvice {
     /**
      * Handles DuplicateConfigurationNameException and returns an HTTP
@@ -68,7 +70,7 @@ public class TaskControllerAdvice {
         WebResponse<Object> response = new WebResponse<>();
         response.setMessage(ex.getMessage());
         // Consider integrating with an alerting system to notify administrators
-        alertAdmin(ex);
+        // alertAdmin(ex);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -41,7 +41,6 @@ public abstract class Util {
         } else {
             return PageRequest.of(page - 1, pageSize, Sort.by(sortBy).ascending());
         }
-        return pageable;
     }
     public static LocalDateTime getCurrentTimestamp() {
         return LocalDateTime.now();

@@ -93,7 +93,9 @@ public class ScheduleService {
      * @return the updated ScheduleDTO
      */
     public ScheduleDTO updateSchedule(ScheduleRequest schedule) {
-        
+        if (Boolean.FALSE.equals(!scheduleRepo.existsByScheduleId(schedule.getScheduleId()))) {
+            throw new NotFoundException("Schedule not found");
+        }
         Schedule scheduleToSave = this.buildSchedule(schedule);
         this.setAuditFields(scheduleToSave);
         scheduleRepo.save(scheduleToSave);
@@ -107,6 +109,9 @@ public class ScheduleService {
     }
 
     public ScheduleDTO getSchedule(String scheduleId) {
+        if (scheduleId == null || scheduleId.isEmpty()) {
+            throw new BadRequestException("Invalid schedule ID");
+        }
         Schedule schedule = scheduleRepo.findByScheduleId(scheduleId)
                 .orElseThrow(() -> new NotFoundException(ApiConstants.INVALID_SCHEDULE_ID));
         log.info("Saved schedule with id: " + schedule.getScheduleId());
