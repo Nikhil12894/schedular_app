@@ -34,13 +34,12 @@ public abstract class Util {
         if(null == sortBy) {
             throw new BadRequestException("Invalid sortBy parameter: " + sortBy + ". Must be a valid field name.");
         }
-        Pageable pageable = null;
         if(sort.equals(ApiConstants.NO_SORT) && sortBy.equals(ApiConstants.NO_SORT)) {
-            pageable = PageRequest.of(page - 1, pageSize);
+            return PageRequest.of(page - 1, pageSize);
         } else if(sort.equals(SortOrder.DESC.name())) {
-            pageable = PageRequest.of(page - 1, pageSize, Sort.by(sortBy).descending());
+            return PageRequest.of(page - 1, pageSize, Sort.by(sortBy).descending());
         } else {
-            pageable = PageRequest.of(page - 1, pageSize, Sort.by(sortBy).ascending());
+            return PageRequest.of(page - 1, pageSize, Sort.by(sortBy).ascending());
         }
         return pageable;
     }
