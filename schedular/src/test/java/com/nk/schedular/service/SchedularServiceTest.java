@@ -65,8 +65,9 @@ class SchedularServiceTest {
     void testCancelTask_InvalidTaskId() {
         // Setup
         // Run the test
-        assertThatThrownBy(() -> schedularServiceUnderTest.cancelTask("taskId"))
-                .isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> schedularServiceUnderTest.cancelTask("invalidTaskId"))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid task ID");
 
 
     }
