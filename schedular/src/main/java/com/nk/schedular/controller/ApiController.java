@@ -23,11 +23,6 @@ public class ApiController {
 
 	
 
-	public ApiController(@Value("${artifact.name}") String artifact,
-			@Value("${spring.profiles.active}") String environment) {
-		this.artifact = artifact;
-		this.environment = environment;
-	}
 
 	/**
 	 * Status api
