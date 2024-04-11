@@ -20,7 +20,9 @@ public interface ScheduleRepo extends ListCrudRepository<Schedule, Long> , ListP
      *
      * @param  scheduleId  the schedule id to delete
      */
-    @Query("delete from Schedule s where s.scheduleId in ?1")
+    @Modifying
+    @Transactional
+    @Query("delete from Schedule s where s.scheduleId = ?1")
     void deleteByScheduleId(String scheduleId);
 
     /**
