@@ -93,7 +93,7 @@ class ScheduleServiceTest {
     void testSaveSchedule_DuplicateTransaction() {
         // Setup
         // Configure ScheduleRepo.existsByScheduleId(...).
-        when(mockScheduleRepo.existsByScheduleId("scheduleId")).thenReturn(true);
+        when(mockScheduleRepo.findByScheduleId("scheduleId")).thenReturn(Optional.of(new Schedule()));
 
         // Run the test
         assertThatThrownBy(() -> scheduleServiceUnderTest.saveSchedule(scheduleRequest))
@@ -134,6 +134,8 @@ class ScheduleServiceTest {
                 .lastUpdatedBy(0L)
                 .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                 .build();
+        // Configure ScheduleRepo.existsById(...).
+        when(mockScheduleRepo.findById(1L)).thenReturn(Optional.of(new Schedule()));
         // Run the test
         final ScheduleDTO result = scheduleServiceUnderTest.updateSchedule(updateScheduleRequest);
 
@@ -200,6 +202,24 @@ class ScheduleServiceTest {
     }
 
     @Test
+    void testGetSchedule_ScheduleIdIsEmptyInRequest() {
+        // Setup
+
+        // Run the test
+        assertThatThrownBy(() -> scheduleServiceUnderTest.getSchedule(""))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void testGetSchedule_ScheduleIdIsNullInRequest() {
+        // Setup
+
+        // Run the test
+        assertThatThrownBy(() -> scheduleServiceUnderTest.getSchedule(null))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
     void testGetAllSchedules() {
         // Setup
         final ScheduleDTOList expectedResult = ScheduleDTOList.builder()
@@ -251,7 +271,7 @@ class ScheduleServiceTest {
         when(mockScheduleRepo.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // Run the test
-        final ScheduleDTOList result = scheduleServiceUnderTest.getAllSchedules(null, null, SortOrder.ASC,
+        final ScheduleDTOList result = scheduleServiceUnderTest.getAllSchedules(null, null, SortOrder.NONE,
                 ScheduleShortBy.SCHEDULE_ID);
 
         // Verify the results
@@ -440,5 +460,40 @@ class ScheduleServiceTest {
         assertThatThrownBy(() -> scheduleServiceUnderTest.getAllSchedulesByCronSchedule(2,
                         ApiConstants.DEFAULT_PAGE_SIZE, SortOrder.ASC,
                         ScheduleShortBy.SCHEDULE_ID, "cronSchedule")).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void testFindOrCreateSchedule_ExistingScheduleFound() {
+        // Setup
+        ScheduleRequest scheduleRequest = ScheduleRequest.builder().scheduleId("existingScheduleId").cronSchedule("0/10 * * ? * *").build();
+        Schedule existingSchedule = new Schedule();
+        when(mockScheduleRepo.findByScheduleId("existingScheduleId")).thenReturn(Optional.of(existingSchedule));
+
+        // Run the test
+        Schedule result = scheduleServiceUnderTest.findOrCreateSchedule(scheduleRequest);
+
+        // Verify the results
+        assertThat(result).isEqualTo(existingSchedule);
+        verify(mockScheduleRepo, times(1)).findByScheduleId("existingScheduleId");
+        // verify(mockScheduleRepo, times(1)).save(any(Schedule.class));
+        verifyNoMoreInteractions(mockScheduleRepo);
+    }
+
+    @Test
+    void testFindOrCreateSchedule_NewScheduleCreated() {
+        // Setup
+        ScheduleRequest scheduleRequest = ScheduleRequest.builder().scheduleId("newScheduleId").cronSchedule("0/10 * * ? * *").build();
+        Schedule newSchedule = new Schedule();
+        when(mockScheduleRepo.findByScheduleId("newScheduleId")).thenReturn(Optional.empty());
+        when(mockScheduleRepo.save(any(Schedule.class))).thenReturn(newSchedule);
+
+        // Run the test
+        Schedule result = scheduleServiceUnderTest.findOrCreateSchedule(scheduleRequest);
+
+        // Verify the results
+        assertThat(result).isEqualTo(newSchedule);
+        verify(mockScheduleRepo, times(1)).findByScheduleId("newScheduleId");
+        verify(mockScheduleRepo, times(1)).save(any(Schedule.class));
+        verifyNoMoreInteractions(mockScheduleRepo);
     }
 }

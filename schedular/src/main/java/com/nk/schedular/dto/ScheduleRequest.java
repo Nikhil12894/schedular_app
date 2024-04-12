@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Schedule request object", requiredMode = Schema.RequiredMode.REQUIRED)
 public class ScheduleRequest {
-    @Schema(description = "schedule id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "schedule id", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("schedule_id")
     private String scheduleId;
 

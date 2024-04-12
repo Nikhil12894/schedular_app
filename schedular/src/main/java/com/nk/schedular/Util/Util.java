@@ -42,6 +42,17 @@ public abstract class Util {
             return PageRequest.of(page - 1, pageSize, Sort.by(sortBy).ascending());
         }
     }
+
+    public static PagePageSizeRecord getResult(Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
+            page = ApiConstants.DEFAULT_PAGE;
+            pageSize = ApiConstants.DEFAULT_PAGE_SIZE;
+        }
+        return new PagePageSizeRecord(page, pageSize);
+    }
+
+    public static record PagePageSizeRecord(Integer page, Integer pageSize) {
+    }
     public static LocalDateTime getCurrentTimestamp() {
         return LocalDateTime.now();
     }
