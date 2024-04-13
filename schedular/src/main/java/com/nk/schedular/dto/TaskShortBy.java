@@ -3,7 +3,8 @@ package com.nk.schedular.dto;
 public enum TaskShortBy {
 	NAME("taskId"),
     DESCRIPTION("description"),
-	ID("id");
+	ID("id"),
+	NONE("NONE");
 
 	private String orderBy;
 

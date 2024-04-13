@@ -26,7 +26,7 @@ public class ApiConstants {
 
     public static final String SORT_BY = "sort_by";
 
-    public static final String NO_SORT = "none";
+    public static final String NO_SORT = "NONE";
 
     public static final String ATTACHMENT = "attachment";
 
@@ -51,5 +51,7 @@ public class ApiConstants {
     public static final String ID = "ID";
 
     public static final String SCHEDULE_ALREADY_EXISTS = "Schedule already exists";
+
+    public static final String SCHEDULE_NOT_FOUND = "Schedule not found";
 
 }

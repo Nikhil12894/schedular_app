@@ -8,7 +8,8 @@ public enum ScheduleShortBy {
     CREATED_BY("createdBy"),
     CREATED_AT("createdAt"),
     LAST_UPDATED_BY("lastUpdatedBy"),
-    LAST_UPDATED_AT("lastUpdatedAt");
+    LAST_UPDATED_AT("lastUpdatedAt"),
+    NONE("NONE");
 
     private String orderBy;
 

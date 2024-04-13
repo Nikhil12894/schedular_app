@@ -8,8 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.nk.schedular.Util.Util;
+import com.nk.schedular.Util.Util.PagePageSizeRecord;
 import com.nk.schedular.constants.ApiConstants;
-import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleRequest;
 import com.nk.schedular.dto.SortOrder;
 import com.nk.schedular.dto.TaskDTO;
@@ -19,6 +19,7 @@ import com.nk.schedular.dto.TaskShortBy;
 import com.nk.schedular.exception.BadRequestException;
 import com.nk.schedular.exception.DuplicateTransactionException;
 import com.nk.schedular.exception.InternalServerException;
+import com.nk.schedular.exception.NotFoundException;
 import com.nk.schedular.model.DemoTask;
 import com.nk.schedular.model.Schedule;
 import com.nk.schedular.repo.TaskRepo;
@@ -34,6 +35,7 @@ public class TaskService {
     private static final String INVALID_PAGE="Invalid page number, number of available pages is ";
     private static final String TASK_ERROR="Exception occurred while getting tasks.";
     private final TaskRepo taskRepo;
+    private final ScheduleService scheduleService;
 
   
     /**
@@ -43,10 +45,13 @@ public class TaskService {
      * @return       the TaskDTO representing the saved task
      */
     public TaskDTO saveTask(TaskRequest task) {
-        DemoTask demoTaskToSave = this.buiDemoTask(task);
+        if(Boolean.TRUE.equals(taskRepo.existsByTaskId(task.getTaskId()))) {
+            throw new DuplicateTransactionException(ApiConstants.INVALID_TASK_ID);
+        }
+        DemoTask demoTaskToSave = this.buildDemoTask(task);
         this.setAuditFields(demoTaskToSave);
-        DemoTask savedTask = this.taskRepo.save(demoTaskToSave);
-        return mapDemoTaskToTaskDTO(savedTask);
+        this.taskRepo.save(demoTaskToSave);
+        return mapDemoTaskToTaskDTO(demoTaskToSave);
     }
 
     /**
@@ -82,29 +87,30 @@ public class TaskService {
      * @return       the TaskDTO representing the updated task
      */
     public TaskDTO updateTask(TaskRequest task) {
-        DemoTask demoTaskToUpdate = this.buiDemoTask(task);
+        if(Boolean.FALSE.equals(taskRepo.existsById(task.getId()))) {
+            throw new NotFoundException(ApiConstants.INVALID_TASK_ID + " " + task.getId());
+        }
+        DemoTask demoTaskToUpdate = this.buildDemoTask(task);
         this.setAuditFields(demoTaskToUpdate);
-        DemoTask updatedTask = this.taskRepo.save(demoTaskToUpdate);
-        return mapDemoTaskToTaskDTO(updatedTask);
+        this.taskRepo.save(demoTaskToUpdate);
+        return mapDemoTaskToTaskDTO(demoTaskToUpdate);
     }
 
-    private DemoTask buiDemoTask(TaskRequest task) {
-        if(Boolean.TRUE.equals(taskRepo.existsByTaskId(task.getTaskId()))) {
-            throw new DuplicateTransactionException(ApiConstants.INVALID_TASK_ID);
-        }
+    /**
+     * Builds a DemoTask object based on the provided TaskRequest.
+     *
+     * @param  task   the TaskRequest containing the details for the DemoTask
+     * @return       the constructed DemoTask object
+     */
+    private DemoTask buildDemoTask(TaskRequest task) {
         ScheduleRequest scheduleRequest = task.getSchedule();
+        Schedule schedule = scheduleService.findOrCreateSchedule(scheduleRequest);
         return DemoTask.builder()
         .id(task.getId())
         .taskId(task.getTaskId())
         .description(task.getDescription())
         .isSchedularEnabled(task.getIsSchedularEnabled())
-        .schedule(
-            Schedule.builder()
-            .id(scheduleRequest.getId())
-            .scheduleId(scheduleRequest.getScheduleId())
-            .cronSchedule(scheduleRequest.getCronSchedule())
-            .build()
-            )
+        .schedule(schedule)
         .build();
     }
     
@@ -173,24 +179,10 @@ public class TaskService {
         TaskList.TaskListBuilder listBuilder = TaskList.builder().tasks(new ArrayList<>());
         try {
             // if no page or pagesize specified return all tasks
-            if (page == null || pageSize == null) {
-                page = ApiConstants.DEFAULT_PAGE;
-                pageSize = ApiConstants.DEFAULT_PAGE_SIZE;
-            }
-            Page<DemoTask> pagedTasks = taskRepo.findAllTaskWithTaskIds(Util.getPageable(page,
-                    pageSize, null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),taskIds);
-            if (page > pagedTasks.getTotalPages()) {
-                throw new BadRequestException(
-                    INVALID_PAGE + pagedTasks.getTotalPages());
-            }
-            if (pagedTasks.hasContent()) {
-                List<TaskDTO> taskDTOList = pagedTasks.getContent().stream()
-                .map(this::mapDemoTaskToTaskDTO).collect(Collectors.toList());
-                listBuilder.tasks(taskDTOList)
-                        .total(pagedTasks.getTotalElements())
-                        .totalPages(pagedTasks.getTotalPages())
-                        .sortBy(sortBy).sortOrder(sort);
-            }
+            PagePageSizeRecord validatedPagePageSize = Util.getResult(page, pageSize);
+            Page<DemoTask> pagedTasks = taskRepo.findAllTaskWithTaskIds(Util.getPageable(validatedPagePageSize.page(),
+                    validatedPagePageSize.pageSize(), null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),taskIds);
+            this.validateAndAddDataToListBuilder(sort, sortBy, listBuilder, validatedPagePageSize, pagedTasks);
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -200,37 +192,24 @@ public class TaskService {
         return listBuilder.build();
     }
 
+    
     /**
-     * A description of the entire Java function.
+     * Retrieves all tasks with optional pagination and sorting.
      *
-     * @param page     description of parameter
-     * @param pageSize description of parameter
-     * @param sort     description of parameter
-     * @param sortBy   description of parameter
-     * @return description of return value
+     * @param  page       the page number for pagination
+     * @param  pageSize   the size of each page for pagination
+     * @param  sort       the sorting order
+     * @param  sortBy     the attribute to sort the tasks by
+     * @return            a TaskList object containing the filtered and sorted tasks
      */
     public TaskList getAllTask(Integer page, Integer pageSize, SortOrder sort, TaskShortBy sortBy) {
         TaskList.TaskListBuilder listBuilder = TaskList.builder().tasks(new ArrayList<>());
         try {
             // if no page or pagesize specified return all tasks
-            if (page == null || pageSize == null) {
-                page = ApiConstants.DEFAULT_PAGE;
-                pageSize = ApiConstants.DEFAULT_PAGE_SIZE;
-            }
-            Page<DemoTask> pagedTasks = taskRepo.findAll(Util.getPageable(page,
-                    pageSize, null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null));
-            if (page > pagedTasks.getTotalPages()) {
-                throw new BadRequestException(
-                    INVALID_PAGE + pagedTasks.getTotalPages());
-            }
-            if (pagedTasks.hasContent()) {
-                List<TaskDTO> taskDTOList = pagedTasks.getContent().stream()
-                .map(this::mapDemoTaskToTaskDTO).collect(Collectors.toList());
-                listBuilder.tasks(taskDTOList)
-                        .total(pagedTasks.getTotalElements())
-                        .totalPages(pagedTasks.getTotalPages())
-                        .sortBy(sortBy).sortOrder(sort);
-            }
+            PagePageSizeRecord validatedPagePageSize = Util.getResult(page, pageSize);
+            Page<DemoTask> pagedTasks = taskRepo.findAll(Util.getPageable(validatedPagePageSize.page(),
+            validatedPagePageSize.pageSize(), null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null));
+            this.validateAndAddDataToListBuilder(sort, sortBy, listBuilder, validatedPagePageSize, pagedTasks);
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -256,25 +235,11 @@ public class TaskService {
         TaskList.TaskListBuilder listBuilder = TaskList.builder().tasks(new ArrayList<>());
         try {
             // if no page or pagesize specified return all tasks
-            if (page == null || pageSize == null) {
-                page = ApiConstants.DEFAULT_PAGE;
-                pageSize = ApiConstants.DEFAULT_PAGE_SIZE;
-            }
-            Page<DemoTask> pagedTasks = taskRepo.findAll(Util.getPageable(page,
-                    pageSize, null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),
+            PagePageSizeRecord validatedPagePageSize = Util.getResult(page, pageSize);
+            Page<DemoTask> pagedTasks = taskRepo.findAll(Util.getPageable(validatedPagePageSize.page(),
+                    validatedPagePageSize.pageSize(), null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),
                     scheduleId);
-            if (page > pagedTasks.getTotalPages()) {
-                throw new BadRequestException(
-                    INVALID_PAGE + pagedTasks.getTotalPages());
-            }
-            if (pagedTasks.hasContent()) {
-                List<TaskDTO> taskDTOList = pagedTasks.getContent().stream()
-                .map(this::mapDemoTaskToTaskDTO).collect(Collectors.toList());
-                listBuilder.tasks(taskDTOList)
-                        .total(pagedTasks.getTotalElements())
-                        .totalPages(pagedTasks.getTotalPages())
-                        .sortBy(sortBy).sortOrder(sort);
-            }
+            this.validateAndAddDataToListBuilder(sort, sortBy, listBuilder, validatedPagePageSize, pagedTasks);
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -285,39 +250,25 @@ public class TaskService {
     }
 
     /**
-     * A description of the entire Java function.
+     * Retrieves all tasks based on the cron expression with pagination and sorting options.
      *
-     * @param  page         description of parameter
-     * @param  pageSize     description of parameter
-     * @param  sort         description of parameter
-     * @param  sortBy       description of parameter
-     * @param  cronSchedule description of parameter
-     * @return              description of return value
+     * @param  page          the page number for pagination
+     * @param  pageSize      the size of each page for pagination
+     * @param  sort          the sorting order for the tasks
+     * @param  sortBy        the attribute to sort the tasks by
+     * @param  cronSchedule  the cron expression to filter the tasks
+     * @return               a TaskList object containing the filtered and sorted tasks
      */
     public TaskList getAllTaskByCronExp(Integer page, Integer pageSize, SortOrder sort, TaskShortBy sortBy,
             String cronSchedule) {
         TaskList.TaskListBuilder listBuilder = TaskList.builder().tasks(new ArrayList<>());
         try {
             // if no page or pagesize specified return all tasks
-            if (page == null || pageSize == null) {
-                page = ApiConstants.DEFAULT_PAGE;
-                pageSize = ApiConstants.DEFAULT_PAGE_SIZE;
-            }
-            Page<DemoTask> pagedTasks = taskRepo.findAllWithCron(Util.getPageable(page,
-                    pageSize, null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),
+            PagePageSizeRecord validatedPagePageSize = Util.getResult(page, pageSize);
+            Page<DemoTask> pagedTasks = taskRepo.findAllWithCron(Util.getPageable(validatedPagePageSize.page(),
+                    validatedPagePageSize.pageSize(), null != sort ? sort.name() : null, null != sortBy ? sortBy.getOrderBy() : null),
                     cronSchedule);
-            if (page > pagedTasks.getTotalPages()) {
-                throw new BadRequestException(
-                    INVALID_PAGE + pagedTasks.getTotalPages());
-            }
-            if (pagedTasks.hasContent()) {
-                List<TaskDTO> taskDTOList = pagedTasks.getContent().stream()
-                .map(this::mapDemoTaskToTaskDTO).collect(Collectors.toList());
-                listBuilder.tasks(taskDTOList)
-                        .total(pagedTasks.getTotalElements())
-                        .totalPages(pagedTasks.getTotalPages())
-                        .sortBy(sortBy).sortOrder(sort);
-            }
+            this.validateAndAddDataToListBuilder(sort, sortBy, listBuilder, validatedPagePageSize, pagedTasks);
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -325,6 +276,31 @@ public class TaskService {
             throw new InternalServerException(TASK_ERROR);
         }
         return listBuilder.build();
+    }
+
+    /**
+     * Validates and adds data to the TaskListBuilder based on sorting criteria.
+     *
+     * @param  sort       the sort order to be applied
+     * @param  sortBy     the criteria to sort tasks by
+     * @param  listBuilder    the TaskListBuilder to add tasks to
+     * @param  validatedPagePageSize     the page and page size record
+     * @param  pagedTasks the paged tasks to process
+     */
+    private void validateAndAddDataToListBuilder(SortOrder sort, TaskShortBy sortBy, TaskList.TaskListBuilder listBuilder, PagePageSizeRecord validatedPagePageSize,
+            Page<DemoTask> pagedTasks) {
+        if (validatedPagePageSize.page() > pagedTasks.getTotalPages()) {
+            throw new BadRequestException(
+                INVALID_PAGE + pagedTasks.getTotalPages());
+        }
+        if (pagedTasks.hasContent()) {
+            List<TaskDTO> taskDTOList = pagedTasks.getContent().stream()
+            .map(this::mapDemoTaskToTaskDTO).collect(Collectors.toList());
+            listBuilder.tasks(taskDTOList)
+                    .total(pagedTasks.getTotalElements())
+                    .totalPages(pagedTasks.getTotalPages())
+                    .sortBy(sortBy).sortOrder(sort);
+        }
     }
 
 
@@ -339,29 +315,11 @@ public class TaskService {
                 .id(demoTask.getId())
                 .description(demoTask.getDescription())
                 .isSchedularEnabled(demoTask.getIsSchedularEnabled())
-                .schedule(mapScheduleToDTO(demoTask.getSchedule()))
+                .schedule(scheduleService.mapScheduleToDTO(demoTask.getSchedule()))
                 .createdAt(demoTask.getCreatedAt())
                 .createdBy(demoTask.getCreatedBy())
                 .lastUpdatedAt(demoTask.getLastUpdatedAt())
                 .lastUpdatedBy(demoTask.getLastUpdatedBy())
-                .build();
-    }
-
-    /**
-     * Maps a Schedule object to a ScheduleDTO object.
-     *
-     * @param  schedule    the Schedule object to be mapped
-     * @return             the ScheduleDTO object mapped from the input Schedule
-     */
-    private ScheduleDTO mapScheduleToDTO(Schedule schedule) {
-        return ScheduleDTO.builder()
-                .id(schedule.getId())
-                .scheduleId(schedule.getScheduleId())
-                .cronSchedule(schedule.getCronSchedule())
-                .lastUpdatedAt(schedule.getLastUpdatedAt())
-                .lastUpdatedBy(schedule.getLastUpdatedBy())
-                .createdAt(schedule.getCreatedAt())
-                .createdBy(schedule.getCreatedBy())
                 .build();
     }
 
