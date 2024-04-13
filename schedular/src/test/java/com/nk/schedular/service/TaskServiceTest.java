@@ -125,46 +125,57 @@ class TaskServiceTest {
 
         @Test
         void testSaveTask() {
-                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false);
-
-                // Configure ScheduleService.findOrCreateSchedule(...).
+                // Arrange
+                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false, false);
                 final Schedule schedule = Schedule.builder()
                                 .createdBy(0L)
+                                .scheduleId("scheduleId")
+                                .cronSchedule("cronSchedule")
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
-                when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
-
-                // Configure TaskRepo.save(...).
-                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false);
-
-                // Configure ScheduleService.mapScheduleToDTO(...).
-                final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
-                                .createdBy(0L)
-                                .createdAt(Testconstants.DEFAULT_DATETIME)
-                                .lastUpdatedBy(0L)
-                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
-                                .build();
-                when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
-                                .createdBy(0L)
-                                .createdAt(Testconstants.DEFAULT_DATETIME)
-                                .lastUpdatedBy(0L)
-                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
-                                .build())).thenReturn(scheduleDTO);
-
-                // Run the test
+                when(mockScheduleService.findOrCreateSchedule(any())).thenReturn(schedule);
+                 // Configure ScheduleService.mapScheduleToDTO(...).
+                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
+                                 .createdBy(0L)
+                                 .createdAt(Testconstants.DEFAULT_DATETIME)
+                                 .scheduleId("scheduleId")
+                                 .cronSchedule("cronSchedule")
+                                 .lastUpdatedBy(0L)
+                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
+                                 .build();
+                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
+                                 .scheduleId("scheduleId")
+                                 .cronSchedule("cronSchedule")
+                                 .createdBy(0L)
+                                 .createdAt(Testconstants.DEFAULT_DATETIME)
+                                 .lastUpdatedBy(0L)
+                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
+                                 .build())).thenReturn(scheduleDTO);
+                // Act
                 final TaskDTO result = taskServiceUnderTest.saveTask(task);
 
-                // Verify the results
+                // Assert
+                assertTaskDTO(result, expectedResult);
+        }
+
+        private void assertTaskDTO(TaskDTO result, TaskDTO expectedResult) {
                 assertThat(result.getId()).isEqualTo(expectedResult.getId());
                 assertThat(result.getDescription()).isEqualTo(expectedResult.getDescription());
                 assertThat(result.getIsSchedularEnabled()).isEqualTo(expectedResult.getIsSchedularEnabled());
-                assertThat(result.getSchedule()).isEqualTo(expectedResult.getSchedule());
+                assertScheduleDTO(result.getSchedule(), expectedResult.getSchedule());
                 assertThat(result.getCreatedBy()).isEqualTo(expectedResult.getCreatedBy());
                 assertThat(result.getCreatedAt()).isNotNull();
                 assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
                 assertThat(result.getLastUpdatedAt()).isNotNull();
+        }
+
+        private void assertScheduleDTO(ScheduleDTO result, ScheduleDTO expectedResult) {
+                assertThat(result.getCreatedBy()).isEqualTo(expectedResult.getCreatedBy());
+                assertThat(result.getCreatedAt()).isEqualTo(expectedResult.getCreatedAt());
+                assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
+                assertThat(result.getLastUpdatedAt()).isEqualTo(expectedResult.getLastUpdatedAt());
         }
 
         @Test
