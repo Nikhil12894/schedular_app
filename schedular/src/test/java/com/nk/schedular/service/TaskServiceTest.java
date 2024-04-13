@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.nk.schedular.constants.ApiConstants;
+import com.nk.schedular.constants.Testconstants;
 import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleRequest;
 import com.nk.schedular.dto.SortOrder;
@@ -36,7 +36,6 @@ import com.nk.schedular.repo.TaskRepo;
 
 @ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
-
         @Mock
         private TaskRepo mockTaskRepo;
         @Mock
@@ -83,14 +82,14 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(ScheduleDTO.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 nullTaskListExpectedResult = TaskList.builder()
                                 .tasks(Collections.emptyList())
@@ -107,14 +106,14 @@ class TaskServiceTest {
                                                 .isSchedularEnabled(false)
                                                 .schedule(ScheduleDTO.builder()
                                                                 .createdBy(0L)
-                                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                                 .lastUpdatedBy(0L)
-                                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                                 .build())
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build()))
                                 .totalPages(1)
                                 .total(1L)
@@ -126,46 +125,57 @@ class TaskServiceTest {
 
         @Test
         void testSaveTask() {
-                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false);
-
-                // Configure ScheduleService.findOrCreateSchedule(...).
+                // Arrange
+                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false, false);
                 final Schedule schedule = Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .scheduleId("scheduleId")
+                                .cronSchedule("cronSchedule")
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
-                when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
-
-                // Configure TaskRepo.save(...).
-                when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false);
-
-                // Configure ScheduleService.mapScheduleToDTO(...).
-                final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
-                                .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                                .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                                .build();
-                when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
-                                .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                                .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                                .build())).thenReturn(scheduleDTO);
-
-                // Run the test
+                when(mockScheduleService.findOrCreateSchedule(any())).thenReturn(schedule);
+                 // Configure ScheduleService.mapScheduleToDTO(...).
+                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
+                                 .createdBy(0L)
+                                 .createdAt(Testconstants.DEFAULT_DATETIME)
+                                 .scheduleId("scheduleId")
+                                 .cronSchedule("cronSchedule")
+                                 .lastUpdatedBy(0L)
+                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
+                                 .build();
+                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
+                                 .scheduleId("scheduleId")
+                                 .cronSchedule("cronSchedule")
+                                 .createdBy(0L)
+                                 .createdAt(Testconstants.DEFAULT_DATETIME)
+                                 .lastUpdatedBy(0L)
+                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
+                                 .build())).thenReturn(scheduleDTO);
+                // Act
                 final TaskDTO result = taskServiceUnderTest.saveTask(task);
 
-                // Verify the results
+                // Assert
+                assertTaskDTO(result, expectedResult);
+        }
+
+        private void assertTaskDTO(TaskDTO result, TaskDTO expectedResult) {
                 assertThat(result.getId()).isEqualTo(expectedResult.getId());
                 assertThat(result.getDescription()).isEqualTo(expectedResult.getDescription());
                 assertThat(result.getIsSchedularEnabled()).isEqualTo(expectedResult.getIsSchedularEnabled());
-                assertThat(result.getSchedule()).isEqualTo(expectedResult.getSchedule());
+                assertScheduleDTO(result.getSchedule(), expectedResult.getSchedule());
                 assertThat(result.getCreatedBy()).isEqualTo(expectedResult.getCreatedBy());
                 assertThat(result.getCreatedAt()).isNotNull();
                 assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
                 assertThat(result.getLastUpdatedAt()).isNotNull();
+        }
+
+        private void assertScheduleDTO(ScheduleDTO result, ScheduleDTO expectedResult) {
+                assertThat(result.getCreatedBy()).isEqualTo(expectedResult.getCreatedBy());
+                assertThat(result.getCreatedAt()).isEqualTo(expectedResult.getCreatedAt());
+                assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
+                assertThat(result.getLastUpdatedAt()).isEqualTo(expectedResult.getLastUpdatedAt());
         }
 
         @Test
@@ -176,9 +186,9 @@ class TaskServiceTest {
                 // Configure ScheduleService.findOrCreateSchedule(...).
                 final Schedule schedule = Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
 
@@ -188,15 +198,15 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -233,29 +243,29 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build());
                 when(mockTaskRepo.findByTaskId("taskId")).thenReturn(demoTask);
 
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -284,22 +294,22 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(ScheduleDTO.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
 
                 // Configure ScheduleService.findOrCreateSchedule(...).
                 final Schedule schedule = Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
 
@@ -309,15 +319,15 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -396,14 +406,14 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAllTaskWithTaskIds(any(Pageable.class), eq(List.of("value"))))
                                 .thenReturn(demoTasks);
@@ -411,15 +421,15 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -442,14 +452,14 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAllTaskWithTaskIds(any(Pageable.class), eq(List.of("value"))))
                                 .thenReturn(demoTasks);
@@ -457,15 +467,15 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -488,14 +498,14 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAllTaskWithTaskIds(any(Pageable.class), eq(List.of("value"))))
                                 .thenReturn(demoTasks);
@@ -503,15 +513,15 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -612,29 +622,29 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAll(any(Pageable.class))).thenReturn(demoTasks);
 
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -714,29 +724,29 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAll(any(Pageable.class), eq("scheduleId"))).thenReturn(demoTasks);
 
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test
@@ -822,29 +832,29 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
-                                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
-                                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                                 .build())
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build()));
                 when(mockTaskRepo.findAllWithCron(any(Pageable.class), eq("cronSchedule"))).thenReturn(demoTasks);
 
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
-                                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
-                                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build())).thenReturn(scheduleDTO);
 
                 // Run the test

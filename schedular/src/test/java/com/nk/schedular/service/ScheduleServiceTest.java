@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.nk.schedular.constants.ApiConstants;
+import com.nk.schedular.constants.Testconstants;
 import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleDTOList;
 import com.nk.schedular.dto.ScheduleRequest;
@@ -55,9 +55,9 @@ class ScheduleServiceTest {
                             .scheduleId("scheduleId")
                             .cronSchedule("0/10 * * ? * *")
                             .createdBy(0L)
-                            .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                            .createdAt(Testconstants.DEFAULT_DATETIME)
                             .lastUpdatedBy(0L)
-                            .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                            .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                             .build();
     }
 
@@ -130,9 +130,9 @@ class ScheduleServiceTest {
                 .scheduleId("scheduleId")
                 .cronSchedule("0/4 * * ? * *")
                 .createdBy(0L)
-                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .createdAt(Testconstants.DEFAULT_DATETIME)
                 .lastUpdatedBy(0L)
-                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build();
         // Configure ScheduleRepo.existsById(...).
         when(mockScheduleRepo.findById(1L)).thenReturn(Optional.of(new Schedule()));
@@ -167,9 +167,9 @@ class ScheduleServiceTest {
                 .scheduleId("scheduleId")
                 .cronSchedule("cronSchedule")
                 .createdBy(0L)
-                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .createdAt(Testconstants.DEFAULT_DATETIME)
                 .lastUpdatedBy(0L)
-                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build();
 
         // Configure ScheduleRepo.findByScheduleId(...).
@@ -178,9 +178,9 @@ class ScheduleServiceTest {
                 .scheduleId("scheduleId")
                 .cronSchedule("cronSchedule")
                 .createdBy(0L)
-                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .createdAt(Testconstants.DEFAULT_DATETIME)
                 .lastUpdatedBy(0L)
-                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build());
         when(mockScheduleRepo.findByScheduleId("scheduleId")).thenReturn(schedule);
 
@@ -228,9 +228,9 @@ class ScheduleServiceTest {
                         .scheduleId("scheduleId")
                         .cronSchedule("cronSchedule")
                         .createdBy(0L)
-                        .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                        .createdAt(Testconstants.DEFAULT_DATETIME)
                         .lastUpdatedBy(0L)
-                        .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                        .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                         .build()))
                 .totalPages(1)
                 .total(1L)
@@ -244,9 +244,9 @@ class ScheduleServiceTest {
                 .scheduleId("scheduleId")
                 .cronSchedule("cronSchedule")
                 .createdBy(0L)
-                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .createdAt(Testconstants.DEFAULT_DATETIME)
                 .lastUpdatedBy(0L)
-                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build()));
         when(mockScheduleRepo.findAll(any(Pageable.class))).thenReturn(schedules);
 
@@ -362,9 +362,9 @@ class ScheduleServiceTest {
                         .scheduleId("scheduleId")
                         .cronSchedule("cronSchedule")
                         .createdBy(0L)
-                        .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                        .createdAt(Testconstants.DEFAULT_DATETIME)
                         .lastUpdatedBy(0L)
-                        .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                        .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                         .build()))
                 .totalPages(1)
                 .total(1L)
@@ -378,9 +378,9 @@ class ScheduleServiceTest {
                 .scheduleId("scheduleId")
                 .cronSchedule("cronSchedule")
                 .createdBy(0L)
-                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .createdAt(Testconstants.DEFAULT_DATETIME)
                 .lastUpdatedBy(0L)
-                .lastUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build()));
         when(mockScheduleRepo.findByCronSchedule(any(Pageable.class), eq("cronSchedule"))).thenReturn(schedules);
 
