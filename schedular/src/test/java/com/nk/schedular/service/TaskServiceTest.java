@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.nk.schedular.constants.ApiConstants;
-import com.nk.schedular.constents.Testconstants;
+import com.nk.schedular.constants.Testconstants;
 import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleRequest;
 import com.nk.schedular.dto.SortOrder;
