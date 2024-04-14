@@ -22,8 +22,8 @@ import com.nk.schedular.constants.Testconstants;
 import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleDTOList;
 import com.nk.schedular.dto.ScheduleRequest;
-import com.nk.schedular.dto.ScheduleShortBy;
-import com.nk.schedular.dto.SortOrder;
+import com.nk.schedular.enums.ScheduleShortBy;
+import com.nk.schedular.enums.SortOrder;
 import com.nk.schedular.exception.BadRequestException;
 import com.nk.schedular.exception.DuplicateTransactionException;
 import com.nk.schedular.exception.InternalServerException;
@@ -146,7 +146,20 @@ class ScheduleServiceTest {
         assertThat(result.getLastUpdatedAt()).isNotNull();
         assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
     }
+    @Test
+    void testUpdateSchedule_ScheduleNotFound() {
+        // Setup
+        final ScheduleRequest updateScheduleRequest = ScheduleRequest.builder()
+                .scheduleId("scheduleId")
+                .cronSchedule("0/4 * * ? * *")
+                .id(1L)
+                .build();
+        // Configure ScheduleRepo.existsById(...).
+        when(mockScheduleRepo.findById(1L)).thenReturn(Optional.empty());
+        // Run the test
+        assertThatThrownBy(() ->scheduleServiceUnderTest.updateSchedule(updateScheduleRequest)).isInstanceOf(NotFoundException.class);
 
+    }
 
 
     @Test

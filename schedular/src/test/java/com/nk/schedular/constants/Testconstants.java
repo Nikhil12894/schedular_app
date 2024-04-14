@@ -1,4 +1,4 @@
-package com.nk.schedular.constents;
+package com.nk.schedular.constants;
 
 import java.time.LocalDateTime;
 

@@ -54,4 +54,6 @@ public class ApiConstants {
 
     public static final String SCHEDULE_NOT_FOUND = "Schedule not found";
 
+    public static final String CRON_EXPRESSION = "cron_expression";
+
 }

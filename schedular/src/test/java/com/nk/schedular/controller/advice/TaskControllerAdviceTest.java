@@ -1,6 +1,9 @@
 package com.nk.schedular.controller.advice;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.nk.schedular.dto.WebResponse;
 import com.nk.schedular.exception.BadRequestException;
 import com.nk.schedular.exception.DataConflictException;
+import com.nk.schedular.exception.DuplicateTransactionException;
 import com.nk.schedular.exception.ForbiddenException;
 import com.nk.schedular.exception.InternalServerException;
 import com.nk.schedular.exception.MethodNotAllowedException;
@@ -27,6 +31,22 @@ class TaskControllerAdviceTest {
     public void setup() {
         taskControllerAdvice = new TaskControllerAdvice();
     }
+
+     @SuppressWarnings("null")
+    @Test
+    void testHandleDDuplicateTransactionException() {
+        // Setup
+        DuplicateTransactionException ex = new DuplicateTransactionException("Duplicate transaction error");
+
+        // Execute
+        ResponseEntity<WebResponse<Object>> responseEntity = taskControllerAdvice.handleDDuplicateTransactionException(ex);
+        WebResponse<Object> response = responseEntity.getBody();
+
+        // Verify
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        assertEquals(ex.getMessage(), response.getMessage());
+    }
+    
     @Test
   void test_HandleBadRequestFormatException() {
     WebResponse<Object> response =  WebResponse.builder().message("BAD REQUEST").build();
@@ -34,6 +54,40 @@ class TaskControllerAdviceTest {
     ResponseEntity<WebResponse<Object>> actualResponse = taskControllerAdvice.handleBadRequestFormatException(new BadRequestException("BAD REQUEST"));
     assertThat(actualResponse).isEqualTo(expectedResponse);
   }
+
+  @SuppressWarnings("null")
+  @Test
+    void test_HandleBadRequestFormatExceptionWithErrors() {
+        BadRequestException ex = new BadRequestException(List.of("Error 1", "Error 2"));
+        ResponseEntity<WebResponse<Object>> responseEntity = taskControllerAdvice.handleBadRequestFormatException(ex);
+        WebResponse<Object> response = responseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(ex.getErrors(), response.getErrors());
+    }
+  @SuppressWarnings("null")
+  @Test
+    void test_HandleBadRequestFormatExceptionWithError() {
+        BadRequestException ex = new BadRequestException("Bad Request", List.of("Error 1", "Error 2"));
+        ResponseEntity<WebResponse<Object>> responseEntity = taskControllerAdvice.handleBadRequestFormatException(ex);
+        WebResponse<Object> response = responseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(ex.getMessage(), response.getMessage());
+        assertEquals(ex.getErrors(), response.getErrors());
+    }
+
+    @SuppressWarnings("null")
+    @Test
+    void test_HandleBadRequestFormatExceptionWithoutError() {
+        BadRequestException ex = new BadRequestException("Bad Request");
+        ResponseEntity<WebResponse<Object>> responseEntity = taskControllerAdvice.handleBadRequestFormatException(ex);
+        WebResponse<Object> response = responseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(ex.getMessage(), response.getMessage());
+        assertEquals(null, response.getErrors());
+    }
 
   @Test
   void test_HandleInternalServerException() {

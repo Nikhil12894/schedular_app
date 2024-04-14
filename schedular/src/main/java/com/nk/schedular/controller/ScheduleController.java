@@ -14,9 +14,9 @@ import com.nk.schedular.constants.ApiConstants;
 import com.nk.schedular.dto.ScheduleDTO;
 import com.nk.schedular.dto.ScheduleDTOList;
 import com.nk.schedular.dto.ScheduleRequest;
-import com.nk.schedular.dto.ScheduleShortBy;
-import com.nk.schedular.dto.SortOrder;
 import com.nk.schedular.dto.WebResponse;
+import com.nk.schedular.enums.ScheduleShortBy;
+import com.nk.schedular.enums.SortOrder;
 import com.nk.schedular.service.ScheduleService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,6 +101,38 @@ public class ScheduleController {
             @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
             @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id") ScheduleShortBy sortBy) {
         ScheduleDTOList scheduleDTOList = scheduleService.getAllSchedules(page, pageSize, sort, sortBy);
+        WebResponse<ScheduleDTOList> response = new WebResponse<>();
+        response.setData(scheduleDTOList);
+        response.setMessage("Fetched Successfully !!");
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
+     * Get All Schedule with cron expression
+     *
+     * @param cronExpression cron expression
+     * @param page           page number
+     * @param pageSize       number of elements per page
+     * @param sort           Order to sort in
+     * @param sortBy         value to sort by
+     * @return ResponseEntity<WebResponse<ScheduleDTOList>>
+     */
+    @Operation(summary = "Get All Schedule with cron expression")
+    @Parameter(name = ApiConstants.CRON_EXPRESSION, description = "cron expression", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE, description = "page number", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE_SIZE, description = "number of elements per page", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.SORT_ORDER, description = "Order to sort in", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_ORDER)
+    @Parameter(name = ApiConstants.SORT_BY, description = "value to sort by", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_CREATED)
+    @GetMapping(path = "/with-cron-expression")
+    public ResponseEntity<WebResponse<ScheduleDTOList>> getAllSchedulesWithCronExpration(
+            @RequestParam(value = ApiConstants.CRON_EXPRESSION, required = true) String cronExpression,
+            @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
+            @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id") ScheduleShortBy sortBy) {
+        ScheduleDTOList scheduleDTOList = scheduleService.getAllSchedulesByCronSchedule(page, pageSize, sort, sortBy,
+                cronExpression);
         WebResponse<ScheduleDTOList> response = new WebResponse<>();
         response.setData(scheduleDTOList);
         response.setMessage("Fetched Successfully !!");
