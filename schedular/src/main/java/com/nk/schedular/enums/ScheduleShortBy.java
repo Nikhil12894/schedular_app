@@ -1,4 +1,4 @@
-package com.nk.schedular.dto;
+package com.nk.schedular.enums;
 
 public enum ScheduleShortBy {
 

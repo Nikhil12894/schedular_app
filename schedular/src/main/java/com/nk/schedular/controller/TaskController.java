@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coreoz.wisp.JobStatus;
 import com.nk.schedular.constants.ApiConstants;
-import com.nk.schedular.dto.SortOrder;
 import com.nk.schedular.dto.TaskDTO;
 import com.nk.schedular.dto.TaskList;
 import com.nk.schedular.dto.TaskRequest;
-import com.nk.schedular.dto.TaskShortBy;
 import com.nk.schedular.dto.WebResponse;
+import com.nk.schedular.enums.SortOrder;
+import com.nk.schedular.enums.TaskShortBy;
 import com.nk.schedular.service.SchedularService;
 import com.nk.schedular.service.TaskService;
 
@@ -86,16 +86,16 @@ public class TaskController {
     @Parameter(name = ApiConstants.PAGE_SIZE, description = "number of elements per page", in = ParameterIn.QUERY)
     @Parameter(name = ApiConstants.SORT_ORDER, description = "Order to sort in", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_ORDER)
     @Parameter(name = ApiConstants.SORT_BY, description = "value to sort by", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_CREATED)
-    @GetMapping
-    public ResponseEntity<WebResponse<TaskList>> getAllConfigurations(
+    @GetMapping("/all")
+    public ResponseEntity<WebResponse<TaskList>> getAllTask(
             @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
             @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
             @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy) {
-        TaskList configurations = taskService.getAllTask(page, pageSize, sort, sortBy);
+        TaskList tasks = taskService.getAllTask(page, pageSize, sort, sortBy);
         WebResponse<TaskList> response = new WebResponse<>();
-        response.setData(configurations);
-        response.setMessage("Successfully fetched all configurations");
+        response.setData(tasks);
+        response.setMessage("Successfully fetched all tasks");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -195,6 +195,57 @@ public class TaskController {
         WebResponse<Boolean> response = new WebResponse<>();
         response.setData(true);
         response.setMessage(DELETED_SUCCESSFULLY);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+     
+    @Operation(summary = "Get All Task with schedule ID")
+    @Parameter(name = ApiConstants.SCHEDULE_ID, description = "schedule id", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE, description = "page number", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE_SIZE, description = "number of elements per page", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.SORT_ORDER, description = "Order to sort in", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_ORDER)
+    @Parameter(name = ApiConstants.SORT_BY, description = "value to sort by", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_CREATED)
+    @GetMapping(path = "/with-schedule-id")
+    public ResponseEntity<WebResponse<TaskList>> getAllTaskWithScheduleID(
+            @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
+            @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy,
+            @RequestParam(value = ApiConstants.SCHEDULE_ID, required = true) String scheduleId) {
+        TaskList configurations = taskService.getAllTaskBySchedule(page, pageSize, sort, sortBy, scheduleId);
+        WebResponse<TaskList> response = new WebResponse<>();
+        response.setData(configurations);
+        response.setMessage("Successfully fetched all task for given schedule");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * Get All Task with cron expression
+     *
+     * @param  page           page number
+     * @param  pageSize       number of elements per page
+     * @param  sort           Order to sort in
+     * @param  sortBy         value to sort by
+     * @param  cronExpression cron expression
+     * @return               ResponseEntity<WebResponse<TaskList>>
+     */
+    @Operation(summary = "Get All Task with cron expression")
+    @Parameter(name = ApiConstants.CRON_EXPRESSION, description = "cron expression", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE, description = "page number", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.PAGE_SIZE, description = "number of elements per page", in = ParameterIn.QUERY)
+    @Parameter(name = ApiConstants.SORT_ORDER, description = "Order to sort in", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_ORDER)
+    @Parameter(name = ApiConstants.SORT_BY, description = "value to sort by", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_CREATED)
+    @GetMapping(path = "/with-cron-expression")
+    public ResponseEntity<WebResponse<TaskList>> getAllTaskWithCronExpression(
+            @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
+            @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy,
+            @RequestParam(value = ApiConstants.CRON_EXPRESSION, required = true) String cronExpression) {
+        TaskList taskList = taskService.getAllTaskByCronExp(page, pageSize, sort, sortBy, cronExpression);
+        WebResponse<TaskList> response = new WebResponse<>();
+        response.setData(taskList);
+        response.setMessage("Successfully fetched all task for given cron expression");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

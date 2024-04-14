@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.nk.schedular.constants.ApiConstants;
-import com.nk.schedular.dto.SortOrder;
+import com.nk.schedular.enums.SortOrder;
 import com.nk.schedular.exception.BadRequestException;
 
 public abstract class Util {
@@ -15,10 +15,10 @@ public abstract class Util {
     private Util() {}
 /**
      * util method to get Pageable object.
-     * @param page
-     * @param pageSize
-     * @param sort
-     * @param sortBy
+     * @param page page no
+     * @param pageSize page size
+     * @param sort shot order asc desc or none
+     * @param sortBy shot by field name
      * @return Pageable object
      */
     public static Pageable getPageable(int page, int pageSize, String sort, String sortBy) {
@@ -29,10 +29,10 @@ public abstract class Util {
             throw new BadRequestException("Page size cannot be less than 1");
         }
         if(null == sort) {
-            throw new BadRequestException("Invalid sort parameter: " + sort + ". Must be 'ASC' or 'DESC'.");
+            throw new BadRequestException("Invalid sort parameter: null. Must be 'ASC' or 'DESC'.");
         }
         if(null == sortBy) {
-            throw new BadRequestException("Invalid sortBy parameter: " + sortBy + ". Must be a valid field name.");
+            throw new BadRequestException("Invalid sortBy parameter: null. Must be a valid field name.");
         }
         if(sort.equals(ApiConstants.NO_SORT) && sortBy.equals(ApiConstants.NO_SORT)) {
             return PageRequest.of(page - 1, pageSize);
@@ -51,7 +51,7 @@ public abstract class Util {
         return new PagePageSizeRecord(page, pageSize);
     }
 
-    public static record PagePageSizeRecord(Integer page, Integer pageSize) {
+    public record PagePageSizeRecord(Integer page, Integer pageSize) {
     }
     public static LocalDateTime getCurrentTimestamp() {
         return LocalDateTime.now();

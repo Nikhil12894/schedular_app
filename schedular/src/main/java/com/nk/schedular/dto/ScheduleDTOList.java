@@ -3,6 +3,8 @@ package com.nk.schedular.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nk.schedular.enums.ScheduleShortBy;
+import com.nk.schedular.enums.SortOrder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
