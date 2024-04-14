@@ -32,7 +32,8 @@ class TaskControllerAdviceTest {
         taskControllerAdvice = new TaskControllerAdvice();
     }
 
-     @Test
+     @SuppressWarnings("null")
+    @Test
     void testHandleDDuplicateTransactionException() {
         // Setup
         DuplicateTransactionException ex = new DuplicateTransactionException("Duplicate transaction error");
@@ -54,6 +55,7 @@ class TaskControllerAdviceTest {
     assertThat(actualResponse).isEqualTo(expectedResponse);
   }
 
+  @SuppressWarnings("null")
   @Test
     void test_HandleBadRequestFormatExceptionWithErrors() {
         BadRequestException ex = new BadRequestException(List.of("Error 1", "Error 2"));
@@ -63,6 +65,7 @@ class TaskControllerAdviceTest {
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals(ex.getErrors(), response.getErrors());
     }
+  @SuppressWarnings("null")
   @Test
     void test_HandleBadRequestFormatExceptionWithError() {
         BadRequestException ex = new BadRequestException("Bad Request", List.of("Error 1", "Error 2"));
@@ -74,6 +77,7 @@ class TaskControllerAdviceTest {
         assertEquals(ex.getErrors(), response.getErrors());
     }
 
+    @SuppressWarnings("null")
     @Test
     void test_HandleBadRequestFormatExceptionWithoutError() {
         BadRequestException ex = new BadRequestException("Bad Request");
