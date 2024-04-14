@@ -69,7 +69,7 @@ public class TaskController {
         Boolean isCancelled = this.schedularService.cancelTask(taskId);
         WebResponse<Boolean> response = new WebResponse<>();
         response.setData(isCancelled);
-        response.setMessage("Task Canaled Successfully !!");
+        response.setMessage("Task Canceled Successfully !!");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
