@@ -89,7 +89,7 @@ class TaskControllerTest {
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo("{\"data\":false,\"message\":\"Task Canaled Successfully !!\",\"errors\":null}");
+        assertThat(response.getContentAsString()).isEqualTo("{\"data\":false,\"message\":\"Task Canceled Successfully !!\",\"errors\":null}");
     }
 
     @Test
