@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Bs5QuartzCronModule } from '@sbzen/ng-cron';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
@@ -16,6 +17,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ScheduleRoutingModule } from './schedule-routing.module';
 import { ScheduleComponent } from './schedule.component';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
     imports: [
@@ -34,8 +36,10 @@ import { ScheduleComponent } from './schedule.component';
         DropdownModule,
         RadioButtonModule,
         InputNumberModule,
-        DialogModule
+        DialogModule,
+        Bs5QuartzCronModule,
+        TabViewModule,
     ],
-    declarations: [ScheduleComponent]
+    declarations: [ScheduleComponent],
 })
-export class ScheduleModule { }
+export class ScheduleModule {}

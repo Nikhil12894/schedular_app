@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Tab } from '@sbzen/ng-cron';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Product } from 'src/app/demo/api/product';
@@ -9,7 +10,7 @@ import { ProductService } from 'src/app/demo/service/product.service';
     providers: [MessageService]
 })
 export class ScheduleComponent implements OnInit {
-
+    readonly tabs = [Tab.SECONDS, Tab.MINUTES, Tab.HOURS, Tab.DAY, Tab.MONTH];
     productDialog: boolean = false;
 
     deleteProductDialog: boolean = false;
