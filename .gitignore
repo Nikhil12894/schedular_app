@@ -33,3 +33,6 @@ build/
 .vscode/
 schedular/.DS_Store
 .DS_Store
+
+### Angular app
+schedular_client/
