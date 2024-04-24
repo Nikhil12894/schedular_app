@@ -30,4 +30,6 @@ public class Schedule extends BaseModel {
     private String scheduleId;
     @Column(name = "cron_schedule",nullable = false)
     private String cronSchedule;
+    // @Column(name = "description")
+    // private String description;
 }

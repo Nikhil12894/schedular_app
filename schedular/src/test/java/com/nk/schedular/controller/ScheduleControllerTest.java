@@ -61,7 +61,7 @@ class ScheduleControllerTest {
                 .thenReturn(scheduleDTO);
         WebResponse<ScheduleDTO> webResponse = new WebResponse<>(scheduleDTO,"Saved Successfully !!",null);
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(post("/api/task/schedule")
+        final MockHttpServletResponse response = mockMvc.perform(post("/api/schedule")
                         .content(objectMapper.writeValueAsString(ScheduleRequest.builder().build())).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -80,7 +80,7 @@ class ScheduleControllerTest {
         WebResponse<ScheduleDTO> webResponse = new WebResponse<>(scheduleDTO,"Updated Successfully !!",null);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(put("/api/task/schedule")
+        final MockHttpServletResponse response = mockMvc.perform(put("/api/schedule")
                         .content(objectMapper.writeValueAsString(scheduleRequest)).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -97,7 +97,7 @@ class ScheduleControllerTest {
         WebResponse<ScheduleDTO> webResponse = new WebResponse<>(scheduleDTO,"Fetched Successfully !!",null);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/api/task/schedule")
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule")
                         .param("schedule_id", "scheduleId")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -114,7 +114,7 @@ class ScheduleControllerTest {
                 .thenReturn(scheduleList);
         webResponse.setMessage("Fetched Successfully !!");
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/api/task/schedule/all")
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule/all")
                         .param("page", "0")
                         .param("page_size", "0")
                         .param("sort_order", "ASC")
@@ -134,7 +134,7 @@ class ScheduleControllerTest {
                 "cronExpression")).thenReturn(scheduleList);
         webResponse.setMessage("Fetched Successfully !!");
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/api/task/schedule/with-cron-expression")
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule/with-cron-expression")
                         .param("cron_expression", "cronExpression")
                         .param("page", "0")
                         .param("page_size", "0")
@@ -152,7 +152,7 @@ class ScheduleControllerTest {
     void testDeleteSchedule() throws Exception {
         // Setup
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(delete("/api/task/schedule")
+        final MockHttpServletResponse response = mockMvc.perform(delete("/api/schedule")
                         .param("schedule_id", "scheduleId")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
