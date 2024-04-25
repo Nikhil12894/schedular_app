@@ -1,0 +1,80 @@
+<div class="card">
+    <p-table
+        #dt
+        [value]="dataList"
+        [lazy]="true"
+        [columns]="tableColumns"
+        (onLazyLoad)="loadData($event)"
+        dataKey="id"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [selection]="selectedRows"
+        (selectionChange)="onSelectionChange($event)"
+        [paginator]="true"
+        [rows]="10"
+        [totalRecords]="totalRecords"
+        [loading]="loading"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowHover]="true"
+        [reorderableColumns]="true"
+        [selectionPageOnly]="true"
+        class="p-datatable-sm"
+    >
+        <ng-template pTemplate="caption">
+            <div
+                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+            >
+                <h5 class="m-0">{{ description }}</h5>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th style="width: 4rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                @for (item of columns; track $index) {
+                <th [id]="item.header" pReorderableColumn>
+                    <div class="flex align-items-center">
+                        {{ item.header }}
+
+                        @if (item.isShotEnabled) {
+                        <p-sortIcon
+                            [field]="item.header"
+                            [pSortableColumn]="item.field"
+                        ></p-sortIcon>
+                        } @if (item.isFilterEnabled) {
+                        <!-- <p-columnFilter
+                            matchMode="contains"
+                            [field]="item.field"
+                        >
+                        </p-columnFilter> -->
+                        <th>
+                            <p-iconField iconPosition="left">
+                                <p-inputIcon styleClass="pi pi-search" />
+                                <input
+                                    type="text"
+                                    pInputText
+                                    placeholder="Search"
+                                />
+                            </p-iconField>
+                        </th>
+                        }
+                    </div>
+                </th>
+                }
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-data>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="data"></p-tableCheckbox>
+                </td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.country.name }}</td>
+                <td>{{ data.company }}</td>
+                <td>{{ data.representative.name }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
