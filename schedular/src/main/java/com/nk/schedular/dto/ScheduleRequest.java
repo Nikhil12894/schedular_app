@@ -25,5 +25,9 @@ public class ScheduleRequest {
     @Schema(description = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @JsonProperty("id")
     private Long id;
+
+    // @Schema(description = "schedule description", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    // @JsonProperty("description")
+    // private String description;
     
 }

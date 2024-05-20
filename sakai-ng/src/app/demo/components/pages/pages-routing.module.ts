@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
         { path: 'empty', loadChildren: () => import('./empty/emptydemo.module').then(m => m.EmptyDemoModule) },
         { path: 'timeline', loadChildren: () => import('./timeline/timelinedemo.module').then(m => m.TimelineDemoModule) },
         { path: 'schedule', loadChildren: () => import('./schedule/schedule.module').then(m => m.ScheduleModule) },
+        { path: 'lazzytable', loadChildren: () => import('../app-table/app-table.module').then(m => m.AppTableModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

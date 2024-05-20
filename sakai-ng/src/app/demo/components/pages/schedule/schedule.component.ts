@@ -1,26 +1,35 @@
 import { Component, OnInit } from '@angular/core';
+import { Tab } from '@sbzen/ng-cron';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Product } from 'src/app/demo/api/product';
 import { ProductService } from 'src/app/demo/service/product.service';
+import { ScheduleDTO, ScheduleDTOList, ScheduleShortBy, Sort } from 'src/domain/schedule';
+import { QueryParam } from 'src/domain/webResponse';
+import { ScheduleService } from 'src/service/schedule.service';
 
 @Component({
     templateUrl: './schedule.component.html',
-    providers: [MessageService]
+    providers: [MessageService],
 })
 export class ScheduleComponent implements OnInit {
+    readonly tabs = [Tab.SECONDS, Tab.MINUTES, Tab.HOURS, Tab.DAY, Tab.MONTH];
 
-    productDialog: boolean = false;
+    isSearch: boolean = false;
 
-    deleteProductDialog: boolean = false;
+    scheduleDialog: boolean = false;
 
-    deleteProductsDialog: boolean = false;
+    deleteScheduleDialog: boolean = false;
 
-    products: Product[] = [];
+    deleteSchedulesDialog: boolean = false;
 
-    product: Product = {};
+    schedules: ScheduleDTO[] = [];
 
-    selectedProducts: Product[] = [];
+    schedule: ScheduleDTO = {};
+
+    selectedSchedules: ScheduleDTO[] = [];
+
+    scheduleDTOList: ScheduleDTOList={};
 
     submitted: boolean = false;
 
@@ -30,94 +39,119 @@ export class ScheduleComponent implements OnInit {
 
     rowsPerPageOptions = [5, 10, 20];
 
-    constructor(private productService: ProductService, private messageService: MessageService) { }
+    queryParam:QueryParam={
+        sort_order:Sort.ASC,
+        sort_by:ScheduleShortBy.CREATED_AT,
+        page:1,
+        page_size:10
+    }
+
+    constructor(
+        private productService: ScheduleService,
+        private messageService: MessageService
+    ) {}
 
     ngOnInit() {
-        this.productService.getProducts().then(data => this.products = data);
-
+        this.productService
+            .getSchedule(this.queryParam).subscribe((res) => {
+                this.scheduleDTOList = res.data;
+                this.schedules = this.scheduleDTOList.scheduleDTOs;
+            })
         this.cols = [
-            { field: 'product', header: 'Product' },
-            { field: 'price', header: 'Price' },
-            { field: 'category', header: 'Category' },
-            { field: 'rating', header: 'Reviews' },
-            { field: 'inventoryStatus', header: 'Status' }
+            { field: 'schedule_id', header: 'Schedule ID' },
+            { field: 'cron_schedule', header: 'Cron Expiration' },
+            { field: 'created_by', header: 'Created By' },
+            { field: 'creation_date', header: 'Created Date' },
+            { field: 'last_updated_by', header: 'Updated By' },
+            { field: 'last_update_date', header: 'Updated Date' },
         ];
 
-        this.statuses = [
-            { label: 'INSTOCK', value: 'instock' },
-            { label: 'LOWSTOCK', value: 'lowstock' },
-            { label: 'OUTOFSTOCK', value: 'outofstock' }
-        ];
     }
 
     openNew() {
-        this.product = {};
+        this.schedule = {};
         this.submitted = false;
-        this.productDialog = true;
+        this.scheduleDialog = true;
     }
 
-    deleteSelectedProducts() {
-        this.deleteProductsDialog = true;
+    deleteSelectedSchedules() {
+        this.deleteSchedulesDialog = true;
     }
 
-    editProduct(product: Product) {
-        this.product = { ...product };
-        this.productDialog = true;
+    editProduct(scheduleObj: ScheduleDTO) {
+        this.schedule = { ...scheduleObj };
+        this.scheduleDialog = true;
     }
 
-    deleteProduct(product: Product) {
-        this.deleteProductDialog = true;
-        this.product = { ...product };
+    deleteProduct(scheduleObj: ScheduleDTO) {
+        this.deleteScheduleDialog = true;
+        this.schedule = { ...scheduleObj };
     }
 
     confirmDeleteSelected() {
-        this.deleteProductsDialog = false;
-        this.products = this.products.filter(val => !this.selectedProducts.includes(val));
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-        this.selectedProducts = [];
+        this.deleteSchedulesDialog = false;
+        this.schedules = this.schedules.filter(
+            (val) => !this.selectedSchedules.includes(val)
+        );
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Products Deleted',
+            life: 3000,
+        });
+        this.selectedSchedules = [];
     }
 
     confirmDelete() {
-        this.deleteProductDialog = false;
-        this.products = this.products.filter(val => val.id !== this.product.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-        this.product = {};
+        this.deleteScheduleDialog = false;
+        this.schedules = this.schedules.filter(
+            (val) => val.id !== this.schedule.id
+        );
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Product Deleted',
+            life: 3000,
+        });
+        this.schedule = {};
     }
 
     hideDialog() {
-        this.productDialog = false;
+        this.scheduleDialog = false;
         this.submitted = false;
     }
 
-    saveProduct() {
+    saveSchedule() {
         this.submitted = true;
 
-        if (this.product.name?.trim()) {
-            if (this.product.id) {
+            if (this.schedule.id) {
                 // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus.value ? this.product.inventoryStatus.value : this.product.inventoryStatus;
-                this.products[this.findIndexById(this.product.id)] = this.product;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                this.schedules[this.findIndexById(this.schedule.id)] =
+                    this.schedule;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Schedule Updated',
+                    life: 3000,
+                });
             } else {
-                this.product.id = this.createId();
-                this.product.code = this.createId();
-                this.product.image = 'product-placeholder.svg';
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus ? this.product.inventoryStatus.value : 'INSTOCK';
-                this.products.push(this.product);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                this.schedules.push(this.schedule);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Schedule Created',
+                    life: 3000,
+                });
             }
-
-            this.products = [...this.products];
-            this.productDialog = false;
-            this.product = {};
-        }
+            this.schedules = [...this.schedules];
+            this.scheduleDialog = false;
+            this.schedule = {};
     }
 
-    findIndexById(id: string): number {
+    findIndexById(id: number): number {
         let index = -1;
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].id === id) {
+        for (let i = 0; i < this.schedules.length; i++) {
+            if (this.schedules[i].id === id) {
                 index = i;
                 break;
             }
@@ -126,16 +160,10 @@ export class ScheduleComponent implements OnInit {
         return index;
     }
 
-    createId(): string {
-        let id = '';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
     onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+        table.filterGlobal(
+            (event.target as HTMLInputElement).value,
+            'contains'
+        );
     }
 }

@@ -15,14 +15,18 @@ import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ScheduleRoutingModule } from './schedule-routing.module';
-import { ScheduleComponent } from './schedule.component';
+import { AppTableRoutingModule } from './app-table-routing.module';
 import { TabViewModule } from 'primeng/tabview';
+import { AppTableComponent } from './app-table.component';
+import { CalendarModule } from 'primeng/calendar';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+
 
 @NgModule({
     imports: [
         CommonModule,
-        ScheduleRoutingModule,
+        AppTableRoutingModule,
         TableModule,
         FileUploadModule,
         FormsModule,
@@ -39,7 +43,10 @@ import { TabViewModule } from 'primeng/tabview';
         DialogModule,
         Bs5QuartzCronModule,
         TabViewModule,
+        CalendarModule,
+        IconFieldModule,
+        InputIconModule
     ],
-    declarations: [ScheduleComponent],
+  declarations: [AppTableComponent]
 })
-export class ScheduleModule {}
+export class AppTableModule {}

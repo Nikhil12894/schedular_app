@@ -109,6 +109,11 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-clock',
                         routerLink: ['/pages/schedule']
                     },
+                    {
+                        label: 'lazzytable',
+                        icon: 'pi pi-fw pi-clock',
+                        routerLink: ['/pages/lazzytable']
+                    }
                 ]
             },
             // {

@@ -1,5 +1,7 @@
 package com.nk.schedular.Util;
 
+import static com.nk.schedular.constants.DateConstants.*;
+
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +56,6 @@ public abstract class Util {
     public record PagePageSizeRecord(Integer page, Integer pageSize) {
     }
     public static LocalDateTime getCurrentTimestamp() {
-        return LocalDateTime.now();
+        return LocalDateTime.now(DEFAULT_ZONEID);
     }
 }

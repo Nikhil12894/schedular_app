@@ -22,4 +22,5 @@ public class ScheduleDTO extends BaseDTO{
     private String scheduleId;
     @JsonProperty("cron_schedule")
     private String cronSchedule;
+    
 }
