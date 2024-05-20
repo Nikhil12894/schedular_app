@@ -102,8 +102,7 @@ public class ScheduleService {
      * @return the updated ScheduleDTO
      */
     public ScheduleDTO updateSchedule(ScheduleRequest schedule) {
-        // this.checkIfScheduleExists(schedule.getId());
-        Optional<Schedule> scheduleOptional = scheduleRepo.findByScheduleId(schedule.getScheduleId());
+        Optional<Schedule> scheduleOptional = scheduleRepo.findById(schedule.getId());
         if(scheduleOptional.isEmpty()) {
             throw new NotFoundException(ApiConstants.SCHEDULE_NOT_FOUND);
         }

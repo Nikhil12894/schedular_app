@@ -134,8 +134,8 @@ class ScheduleServiceTest {
                 .lastUpdatedBy(0L)
                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                 .build();
-        // Configure ScheduleRepo.findByScheduleId(...).
-        when(mockScheduleRepo.findByScheduleId("scheduleId")).thenReturn(Optional.of(new Schedule()));
+        // Configure ScheduleRepo.findById(...).
+        when(mockScheduleRepo.findById(1L)).thenReturn(Optional.of(new Schedule()));
         // Run the test
         final ScheduleDTO result = scheduleServiceUnderTest.updateSchedule(updateScheduleRequest);
 
@@ -154,8 +154,8 @@ class ScheduleServiceTest {
                 .cronSchedule("0/4 * * ? * *")
                 .id(1L)
                 .build();
-        // Configure ScheduleRepo.existsById(...).
-        when(mockScheduleRepo.findByScheduleId("scheduleId")).thenReturn(Optional.empty());
+        // Configure ScheduleRepo.findById(...).
+        when(mockScheduleRepo.findById(1L)).thenReturn(Optional.empty());
         // Run the test
         assertThatThrownBy(() ->scheduleServiceUnderTest.updateSchedule(updateScheduleRequest)).isInstanceOf(NotFoundException.class);
 
