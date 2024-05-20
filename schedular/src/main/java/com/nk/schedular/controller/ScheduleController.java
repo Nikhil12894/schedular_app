@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin("http://localhost:4200/")
+@CrossOrigin("http://localhost:5173/")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/schedule")

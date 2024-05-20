@@ -3,6 +3,7 @@ package com.nk.schedular.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -75,19 +76,6 @@ public class ScheduleService {
     }
 
     /**
-     * Checks if a schedule with the given id exists. If it does not,
-     * throws a NotFoundException.
-     *
-     * @param id The id of the schedule to check
-     * @throws NotFoundException if the schedule with the given id does not exist
-     */
-    private void checkIfScheduleExists(Long id) {
-        if (scheduleRepo.findById(id).isEmpty()) {
-            throw new NotFoundException(ApiConstants.SCHEDULE_NOT_FOUND);
-        }
-    }
-
-    /**
      * Sets the audit fields for the given Schedule object. If the Schedule's ID is
      * null or 0,
      * it sets the createdBy and createdAt fields. It always sets lastUpdatedBy and
@@ -114,12 +102,19 @@ public class ScheduleService {
      * @return the updated ScheduleDTO
      */
     public ScheduleDTO updateSchedule(ScheduleRequest schedule) {
-        this.checkIfScheduleExists(schedule.getId());
-        Schedule scheduleToSave = this.buildSchedule(schedule);
-        this.setAuditFields(scheduleToSave);
-        scheduleRepo.save(scheduleToSave);
-        log.info("Updated schedule with id: " + scheduleToSave.getScheduleId());
-        return this.mapScheduleToDTO(scheduleToSave);
+        // this.checkIfScheduleExists(schedule.getId());
+        Optional<Schedule> scheduleOptional = scheduleRepo.findByScheduleId(schedule.getScheduleId());
+        if(scheduleOptional.isEmpty()) {
+            throw new NotFoundException(ApiConstants.SCHEDULE_NOT_FOUND);
+        }
+        Schedule scheduleToUpdate = scheduleOptional.get();
+        scheduleToUpdate.setCronSchedule(schedule.getCronSchedule());
+        scheduleToUpdate.setScheduleId(schedule.getScheduleId());
+        scheduleToUpdate.setId(schedule.getId());
+        this.setAuditFields(scheduleToUpdate);
+        scheduleRepo.save(scheduleToUpdate);
+        log.info("Updated schedule with id: " + scheduleToUpdate.getScheduleId());
+        return this.mapScheduleToDTO(scheduleToUpdate);
     }
 
     /**
