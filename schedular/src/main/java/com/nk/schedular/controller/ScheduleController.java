@@ -1,5 +1,7 @@
 package com.nk.schedular.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -159,5 +161,22 @@ public class ScheduleController {
         response.setMessage("Deleted Successfully !!");
         return ResponseEntity.ok(response);
     }
+
+
+    /**
+     * Retrieves all distinct cron expressions.
+     *
+     * @return          A ResponseEntity containing a WebResponse with a list of distinct cron expressions and a success message.
+     */
+     @Operation(summary = "Get all distinct cron expression")
+     @GetMapping(path = "/distinct-cron-expression")
+     public ResponseEntity<WebResponse<List<String>>> distinctCronExp() {
+         List<String> distinctCronExpression = scheduleService.getDistinctCronExpression();
+         WebResponse<List<String>> response = new WebResponse<>();
+         response.setData(distinctCronExpression);
+         response.setMessage(" Successfully !!");
+         return ResponseEntity.ok(response);
+     }
+
 
 }

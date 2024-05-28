@@ -250,4 +250,13 @@ public class ScheduleService {
                 });
     }
 
+    /**
+     * Retrieves a list of distinct cron expressions from the schedule repository.
+     *
+     * @return a list of distinct cron expressions
+     */
+    public List<String> getDistinctCronExpression() {
+        return scheduleRepo.getDistinctCronExpression();
+    }
+
 }
