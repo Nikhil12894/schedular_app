@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin("http://localhost:5173/")
 @RestController
 @RequestMapping("/api/task")
 @RequiredArgsConstructor
@@ -91,7 +93,7 @@ public class TaskController {
             @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
             @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
-            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy) {
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = ApiConstants.DEFAULT_SORT_CREATED ) TaskShortBy sortBy) {
         TaskList tasks = taskService.getAllTask(page, pageSize, sort, sortBy);
         WebResponse<TaskList> response = new WebResponse<>();
         response.setData(tasks);

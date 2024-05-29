@@ -313,6 +313,7 @@ public class TaskService {
     private TaskDTO mapDemoTaskToTaskDTO(DemoTask demoTask) {
         return TaskDTO.builder()
                 .id(demoTask.getId())
+                .taskId(demoTask.getTaskId())
                 .description(demoTask.getDescription())
                 .isSchedularEnabled(demoTask.getIsSchedularEnabled())
                 .schedule(scheduleService.mapScheduleToDTO(demoTask.getSchedule()))
