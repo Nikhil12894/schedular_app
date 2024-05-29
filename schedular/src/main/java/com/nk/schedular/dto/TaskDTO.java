@@ -22,6 +22,12 @@ public class TaskDTO extends BaseDTO{
     private String description;
     @JsonProperty("is_schedular_enabled")
     private Boolean isSchedularEnabled;
+
     private ScheduleDTO schedule;
+
+
+    public String getSchedule(){
+        return this.schedule!=null?this.schedule.getScheduleId():null;
+    }
     
 }

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.nk.schedular.Util.Util;
 import com.nk.schedular.Util.Util.PagePageSizeRecord;
 import com.nk.schedular.constants.ApiConstants;
-import com.nk.schedular.dto.ScheduleRequest;
 import com.nk.schedular.dto.TaskDTO;
 import com.nk.schedular.dto.TaskList;
 import com.nk.schedular.dto.TaskRequest;
@@ -103,8 +102,7 @@ public class TaskService {
      * @return       the constructed DemoTask object
      */
     private DemoTask buildDemoTask(TaskRequest task) {
-        ScheduleRequest scheduleRequest = task.getSchedule();
-        Schedule schedule = scheduleService.findOrCreateSchedule(scheduleRequest);
+        Schedule schedule = scheduleService.getScheduleWithScheduleID(task.getSchedule());
         return DemoTask.builder()
         .id(task.getId())
         .taskId(task.getTaskId())
@@ -289,7 +287,7 @@ public class TaskService {
      */
     private void validateAndAddDataToListBuilder(SortOrder sort, TaskShortBy sortBy, TaskList.TaskListBuilder listBuilder, PagePageSizeRecord validatedPagePageSize,
             Page<DemoTask> pagedTasks) {
-        if (validatedPagePageSize.page() > pagedTasks.getTotalPages()) {
+        if (pagedTasks.hasContent() && validatedPagePageSize.page() > pagedTasks.getTotalPages()) {
             throw new BadRequestException(
                 INVALID_PAGE + pagedTasks.getTotalPages());
         }

@@ -32,5 +32,5 @@ public class TaskRequest {
 
     @Schema(description = "schedule", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("schedule")
-    private ScheduleRequest schedule;
+    private String schedule;
 }

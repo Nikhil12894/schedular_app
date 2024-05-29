@@ -179,4 +179,21 @@ public class ScheduleController {
      }
 
 
+  
+    /**
+     * Retrieves all distinct cron expressions and returns them as a response entity.
+     *
+     * @return          A ResponseEntity containing a WebResponse with a list of distinct cron expressions and a success message.
+     */
+    @Operation(summary = "Get all schedule ID")
+    @GetMapping(path = "/all-schedule-id")
+    public ResponseEntity<WebResponse<List<String>>> allScheduleID() {
+        List<String> distinctCronExpression = scheduleService.getAllScheduleID();
+        WebResponse<List<String>> response = new WebResponse<>();
+        response.setData(distinctCronExpression);
+        response.setMessage(" Successfully !!");
+        return ResponseEntity.ok(response);
+    }
+
+
 }

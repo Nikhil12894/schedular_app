@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import com.nk.schedular.constants.ApiConstants;
 import com.nk.schedular.constants.Testconstants;
 import com.nk.schedular.dto.ScheduleDTO;
-import com.nk.schedular.dto.ScheduleRequest;
 import com.nk.schedular.dto.TaskDTO;
 import com.nk.schedular.dto.TaskList;
 import com.nk.schedular.dto.TaskRequest;
@@ -59,7 +58,7 @@ class TaskServiceTest {
                                 .taskId("taskId")
                                 .description("description")
                                 .isSchedularEnabled(false)
-                                .schedule(ScheduleRequest.builder().build())
+                                .schedule("scheduleId")
                                 .build();
 
                 taskWithNullID = TaskRequest.builder()
@@ -67,14 +66,14 @@ class TaskServiceTest {
                                 .taskId("taskId")
                                 .description("description")
                                 .isSchedularEnabled(false)
-                                .schedule(ScheduleRequest.builder().build())
+                                .schedule("scheduleId")
                                 .build();
                 taskWithPstvID = TaskRequest.builder()
                                 .id(1L)
                                 .taskId("taskId")
                                 .description("description")
                                 .isSchedularEnabled(false)
-                                .schedule(ScheduleRequest.builder().build())
+                                .schedule("scheduleId")
                                 .build();
                 expectedResult = TaskDTO.builder()
                                 .id(0L)
@@ -82,6 +81,7 @@ class TaskServiceTest {
                                 .taskId("taskId")
                                 .isSchedularEnabled(false)
                                 .schedule(ScheduleDTO.builder()
+                                .scheduleId("scheduleId")
                                                 .createdBy(0L)
                                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
@@ -137,7 +137,7 @@ class TaskServiceTest {
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
-                when(mockScheduleService.findOrCreateSchedule(any())).thenReturn(schedule);
+                when(mockScheduleService.getScheduleWithScheduleID(any())).thenReturn(schedule);
                  // Configure ScheduleService.mapScheduleToDTO(...).
                  final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                  .createdBy(0L)
@@ -166,7 +166,7 @@ class TaskServiceTest {
                 assertThat(result.getId()).isEqualTo(expectedResult.getId());
                 assertThat(result.getDescription()).isEqualTo(expectedResult.getDescription());
                 assertThat(result.getIsSchedularEnabled()).isEqualTo(expectedResult.getIsSchedularEnabled());
-                assertScheduleDTO(result.getSchedule(), expectedResult.getSchedule());
+                assertThat(result.getSchedule()).isEqualTo( expectedResult.getSchedule());
                 assertThat(result.getCreatedBy()).isEqualTo(expectedResult.getCreatedBy());
                 assertThat(result.getCreatedAt()).isNotNull();
                 assertThat(result.getLastUpdatedBy()).isEqualTo(expectedResult.getLastUpdatedBy());
@@ -188,11 +188,12 @@ class TaskServiceTest {
                 // Configure ScheduleService.findOrCreateSchedule(...).
                 final Schedule schedule = Schedule.builder()
                                 .createdBy(0L)
+                                .scheduleId("scheduleId")
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
-                when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
+                when(mockScheduleService.getScheduleWithScheduleID(any())).thenReturn(schedule);
 
                 // Configure TaskRepo.save(...).
                 when(mockTaskRepo.existsByTaskId("taskId")).thenReturn(false);
@@ -200,12 +201,14 @@ class TaskServiceTest {
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
+                                .scheduleId("scheduleId")
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
+                                .scheduleId("scheduleId")
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
@@ -245,6 +248,7 @@ class TaskServiceTest {
                                 .isSchedularEnabled(false)
                                 .schedule(Schedule.builder()
                                                 .createdBy(0L)
+                                                .scheduleId("scheduleId")
                                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                                 .lastUpdatedBy(0L)
                                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
@@ -260,11 +264,13 @@ class TaskServiceTest {
                 final ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                                 .createdBy(0L)
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
+                                .scheduleId("scheduleId")
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
                 when(mockScheduleService.mapScheduleToDTO(Schedule.builder()
                                 .createdBy(0L)
+                                .scheduleId("scheduleId")
                                 .createdAt(Testconstants.DEFAULT_DATETIME)
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
@@ -313,7 +319,7 @@ class TaskServiceTest {
                                 .lastUpdatedBy(0L)
                                 .lastUpdatedAt(Testconstants.DEFAULT_DATETIME)
                                 .build();
-                when(mockScheduleService.findOrCreateSchedule(ScheduleRequest.builder().build())).thenReturn(schedule);
+                when(mockScheduleService.getScheduleWithScheduleID(any())).thenReturn(schedule);
 
                 // Configure TaskRepo.save(...).
                 when(mockTaskRepo.existsById(1L)).thenReturn(true);
@@ -590,7 +596,7 @@ class TaskServiceTest {
                 List<String> taskIds = List.of("value");
                 // Configure ScheduleService.mapScheduleToDTO(...).
                 when(mockTaskRepo.findAllTaskWithTaskIds(any(Pageable.class), eq(taskIds)))
-                                .thenReturn(new PageImpl<>(Collections.emptyList()));
+                                .thenReturn(new PageImpl<>(List.of(DemoTask.builder().build())));
 
                 // Run the test
                 assertThatThrownBy(() -> taskServiceUnderTest.getTaskByTaskIds(taskIds, 2,

@@ -45,4 +45,7 @@ public interface ScheduleRepo extends ListCrudRepository<Schedule, Long> , ListP
     @Query("select distinct s.cronSchedule from Schedule s")
     List<String> getDistinctCronExpression();
 
+    @Query("select s.scheduleId from Schedule s")
+    List<String> getAllScheduleID();
+
 }

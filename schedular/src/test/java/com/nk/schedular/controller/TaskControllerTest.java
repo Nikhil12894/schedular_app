@@ -96,14 +96,14 @@ class TaskControllerTest {
     void testGetAllTask() throws Exception {
         // Setup
         webResponse.setMessage("Successfully fetched all tasks");
-        when(mockTaskService.getAllTask(0, 0, SortOrder.ASC, TaskShortBy.CREATED_AT)).thenReturn(taskList);
+        when(mockTaskService.getAllTask(1, 10, SortOrder.ASC, TaskShortBy.CREATED_AT)).thenReturn(taskList);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/api/task/all")
-                        .param("page", "0")
-                        .param("page_size", "0")
-                        .param("sort_order", "ASC")
-                        .param("sort_by", ApiConstants.DEFAULT_SORT_CREATED)
+                        .param(ApiConstants.PAGE, ApiConstants.DEFAULT_PAGE.toString())
+                        .param(ApiConstants.PAGE_SIZE, ApiConstants.DEFAULT_PAGE_SIZE.toString())
+                        .param(ApiConstants.SORT_ORDER, ApiConstants.DEFAULT_SORT_ORDER)
+                        .param(ApiConstants.SORT_BY, ApiConstants.DEFAULT_SORT_CREATED)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
