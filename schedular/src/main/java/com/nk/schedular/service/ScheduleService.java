@@ -137,9 +137,13 @@ public class ScheduleService {
         if (scheduleId == null || scheduleId.isEmpty()) {
             throw new BadRequestException("Invalid schedule ID");
         }
-        Schedule schedule = scheduleRepo.findByScheduleId(scheduleId)
-                .orElseThrow(() -> new NotFoundException(ApiConstants.INVALID_SCHEDULE_ID));
+        Schedule schedule = getScheduleWithScheduleID(scheduleId);
         return this.mapScheduleToDTO(schedule);
+    }
+
+    public Schedule getScheduleWithScheduleID(String scheduleId) {
+        return scheduleRepo.findByScheduleId(scheduleId)
+                .orElseThrow(() -> new NotFoundException(ApiConstants.INVALID_SCHEDULE_ID));
     }
 
     /**
@@ -248,6 +252,24 @@ public class ScheduleService {
                     this.setAuditFields(scheduleToSave);
                     return scheduleRepo.save(scheduleToSave);
                 });
+    }
+
+    /**
+     * Retrieves a list of distinct cron expressions from the schedule repository.
+     *
+     * @return a list of distinct cron expressions
+     */
+    public List<String> getDistinctCronExpression() {
+        return scheduleRepo.getDistinctCronExpression();
+    }
+
+    /**
+     * Retrieves a list of all schedule IDs from the schedule repository.
+     *
+     * @return a list of all schedule IDs
+     */
+    public List<String> getAllScheduleID() {
+        return scheduleRepo.getAllScheduleID();
     }
 
 }

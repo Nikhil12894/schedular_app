@@ -72,12 +72,7 @@ public class DBOperationRunner implements CommandLineRunner {
                 .taskId("TEST_TASK_1")
                 .description("TEST_TASK_1")
                 .isSchedularEnabled(true)
-                .schedule(ScheduleRequest.builder()
-                .id(savedSchedule.getId())
-                .scheduleId(savedSchedule.getScheduleId())
-                .cronSchedule(savedSchedule.getCronSchedule())
-                .build()
-                )
+                .schedule("EVERY_10_SECONDS")
                 .build());
     }
 

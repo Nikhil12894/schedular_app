@@ -1,5 +1,6 @@
 package com.nk.schedular.repo;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -40,5 +41,11 @@ public interface ScheduleRepo extends ListCrudRepository<Schedule, Long> , ListP
 
 
     Boolean existsByScheduleId(String name);
+
+    @Query("select distinct s.cronSchedule from Schedule s")
+    List<String> getDistinctCronExpression();
+
+    @Query("select s.scheduleId from Schedule s")
+    List<String> getAllScheduleID();
 
 }

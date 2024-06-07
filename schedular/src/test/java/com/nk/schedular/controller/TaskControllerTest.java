@@ -56,7 +56,7 @@ class TaskControllerTest {
                                 .taskId("taskId")
                                 .build();
         taskList = TaskList.builder()
-        .tasks(List.of(taskDTO)).totalPages(2).sortBy(TaskShortBy.NAME).sortOrder(SortOrder.ASC).total(10L).build();
+        .tasks(List.of(taskDTO)).totalPages(2).sortBy(TaskShortBy.CREATED_AT).sortOrder(SortOrder.ASC).total(10L).build();
         webResponse = WebResponse.<TaskList>builder().data(taskList)
         .build();
     }
@@ -96,14 +96,14 @@ class TaskControllerTest {
     void testGetAllTask() throws Exception {
         // Setup
         webResponse.setMessage("Successfully fetched all tasks");
-        when(mockTaskService.getAllTask(0, 0, SortOrder.ASC, TaskShortBy.NAME)).thenReturn(taskList);
+        when(mockTaskService.getAllTask(1, 10, SortOrder.ASC, TaskShortBy.CREATED_AT)).thenReturn(taskList);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/api/task/all")
-                        .param("page", "0")
-                        .param("page_size", "0")
-                        .param("sort_order", "ASC")
-                        .param("sort_by", "NAME")
+                        .param(ApiConstants.PAGE, ApiConstants.DEFAULT_PAGE.toString())
+                        .param(ApiConstants.PAGE_SIZE, ApiConstants.DEFAULT_PAGE_SIZE.toString())
+                        .param(ApiConstants.SORT_ORDER, ApiConstants.DEFAULT_SORT_ORDER)
+                        .param(ApiConstants.SORT_BY, ApiConstants.DEFAULT_SORT_CREATED)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
@@ -209,7 +209,7 @@ class TaskControllerTest {
     void testGetAllTaskWithScheduleID() throws Exception {
         // Setup
         webResponse.setMessage("Successfully fetched all task for given schedule");
-        when(mockTaskService.getAllTaskBySchedule(0, 0, SortOrder.ASC, TaskShortBy.NAME, "scheduleId"))
+        when(mockTaskService.getAllTaskBySchedule(0, 0, SortOrder.ASC, TaskShortBy.CREATED_AT, "scheduleId"))
                 .thenReturn(taskList);
 
         // Run the test
@@ -217,7 +217,7 @@ class TaskControllerTest {
                         .param("page", "0")
                         .param("page_size", "0")
                         .param("sort_order", "ASC")
-                        .param("sort_by", "NAME")
+                        .param("sort_by", ApiConstants.DEFAULT_SORT_CREATED)
                         .param("schedule_id", "scheduleId")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -232,7 +232,7 @@ class TaskControllerTest {
         // Setup
         webResponse.setMessage("Successfully fetched all task for given cron expression");
         when(mockTaskService.getAllTaskByCronExp(ApiConstants.DEFAULT_PAGE, ApiConstants.DEFAULT_PAGE_SIZE, 
-        SortOrder.ASC, TaskShortBy.NAME, "cronExpression"))
+        SortOrder.ASC, TaskShortBy.CREATED_AT, "cronExpression"))
                 .thenReturn(taskList);
         
         // Run the test
@@ -240,7 +240,7 @@ class TaskControllerTest {
                         .param("page", ApiConstants.DEFAULT_PAGE.toString())
                         .param("page_size", ApiConstants.DEFAULT_PAGE_SIZE.toString())
                         .param("sort_order", "ASC")
-                        .param("sort_by", "NAME")
+                        .param("sort_by", ApiConstants.DEFAULT_SORT_CREATED)
                         .param("cron_expression", "cronExpression")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

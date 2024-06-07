@@ -91,7 +91,7 @@ public class TaskController {
             @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
             @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
-            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy) {
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = ApiConstants.DEFAULT_SORT_CREATED ) TaskShortBy sortBy) {
         TaskList tasks = taskService.getAllTask(page, pageSize, sort, sortBy);
         WebResponse<TaskList> response = new WebResponse<>();
         response.setData(tasks);
@@ -210,7 +210,7 @@ public class TaskController {
             @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
             @RequestParam(value = ApiConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(value = ApiConstants.SORT_ORDER, defaultValue = ApiConstants.DEFAULT_SORT_ORDER) SortOrder sort,
-            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = "id" ) TaskShortBy sortBy,
+            @RequestParam(value = ApiConstants.SORT_BY, defaultValue = ApiConstants.DEFAULT_SORT_CREATED ) TaskShortBy sortBy,
             @RequestParam(value = ApiConstants.SCHEDULE_ID, required = true) String scheduleId) {
         TaskList configurations = taskService.getAllTaskBySchedule(page, pageSize, sort, sortBy, scheduleId);
         WebResponse<TaskList> response = new WebResponse<>();

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -161,5 +162,58 @@ class ScheduleControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo("{\"data\":true,\"message\":\"Deleted Successfully !!\",\"errors\":null}");
         verify(mockScheduleService).deleteSchedule("scheduleId");
+    }
+
+
+    @Test
+    void testDistinctCronExp_SuccessfulRetrieval() throws Exception {
+        // Arrange
+        List<String> cronExpressions = Arrays.asList("cron1", "cron2");
+        when(mockScheduleService.getDistinctCronExpression()).thenReturn(cronExpressions);
+
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule/distinct-cron-expression")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"data\":[\"cron1\",\"cron2\"],\"message\":\" Successfully !!\",\"errors\":null}");
+
+        verify(mockScheduleService).getDistinctCronExpression();
+    }
+
+    @Test
+    void testDistinctCronExp_EmptyList() throws Exception {
+        // Arrange
+        List<String> cronExpressions = Arrays.asList();
+        when(mockScheduleService.getDistinctCronExpression()).thenReturn(cronExpressions);
+
+        // Act
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule/distinct-cron-expression")
+        .accept(MediaType.APPLICATION_JSON))
+.andReturn().getResponse();
+
+// Assert
+assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+assertThat(response.getContentAsString()).isEqualTo("{\"data\":[],\"message\":\" Successfully !!\",\"errors\":null}");
+
+verify(mockScheduleService).getDistinctCronExpression();
+    }
+
+    @Test
+    void testDistinctCronExp_NullList() throws Exception {
+        // Arrange
+        when(mockScheduleService.getDistinctCronExpression()).thenReturn(null);
+
+        // Act
+        final MockHttpServletResponse response = mockMvc.perform(get("/api/schedule/distinct-cron-expression")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"data\":null,\"message\":\" Successfully !!\",\"errors\":null}");
+
+        verify(mockScheduleService).getDistinctCronExpression();
     }
 }
