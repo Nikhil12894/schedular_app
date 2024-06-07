@@ -49,3 +49,28 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: target/schedule
+      
+       # Setup Container build action
+      - name: Set up Container Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Login to GitHub Registry
+      # Comment out if you're pushing to OCIR
+      - name: Login to Github Packages
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build image and push to GitHub Container Registry
+        uses: docker/build-push-action@v3
+        with:
+          # Relative path to the place where source code with Dockerfile is located
+          context: ./
+          # Note: tags has to be all lower-case
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          # build on feature branches, push only on main branch
+          push: ${{ github.ref == 'refs/heads/main' }}
