@@ -39,11 +39,11 @@ jobs:
         sdk install java 21.0.2-graalce
         java -version
 
-    - name: Install GraalVM Native Image
-      run: |
-        source "$HOME/.sdkman/bin/sdkman-init.sh"
-        gu install native-image
-        native-image --version
+    # - name: Install GraalVM Native Image
+    #   run: |
+    #     source "$HOME/.sdkman/bin/sdkman-init.sh"
+    #     gu install native-image
+    #     native-image --version
 
     - name: Install Maven, that uses GraalVM for later builds
       run: |
