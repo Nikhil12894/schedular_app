@@ -45,16 +45,10 @@ jobs:
       - name: Build artifact
         run: mvn -Pnative native:compile -DskipTests=true
       
-      - name: Upload binary
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          path: target/schedule
-
-      - name: Login into Gocker Hub Container Registry first, so that we can push our Image later
-        run: echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-    
-      - name: Compile Native Image using Docker
-        run: docker build . --tag=nikhil12894/schedule:latest
-
-      - name: push to docker hub
-        run: docker push nikhil12894/schedule:latest
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./target/schedule${{ matrix.executable-suffix }}
+          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
+          tag: ${{ github.ref }}
