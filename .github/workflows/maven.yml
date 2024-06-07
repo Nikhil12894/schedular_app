@@ -36,7 +36,7 @@ jobs:
       run: |
         curl -s "https://get.sdkman.io" | bash
         source "$HOME/.sdkman/bin/sdkman-init.sh"
-        sdk install java 21.2.0.r11-grl
+        sdk install java 21.0.2-graalce
         java -version
 
     - name: Install GraalVM Native Image
