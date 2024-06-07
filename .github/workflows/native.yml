@@ -3,6 +3,7 @@ name: Artifacts native build and upload
 on:
   release:
     types: [published]
+
     
 defaults:
   run:
@@ -33,9 +34,11 @@ jobs:
         uses: graalvm/setup-graalvm@v1
         with:
           version: latest
-          java-version: 21
+          java-version: '21'
+          distribution: 'graalvm'
           components: native-image
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
 
       - name: Build artifact
         run: mvn -Pnative native:compile -DskipTests=true
