@@ -1,6 +1,8 @@
 name: Artifacts native build and upload
 
 on:
+  push:
+    branches: [ "dev" ]
   release:
     types: [published]
 
@@ -42,11 +44,8 @@ jobs:
 
       - name: Build artifact
         run: mvn -Pnative native:compile -DskipTests=true
-
-      - name: Upload artifact to release
-        uses: svenstaro/upload-release-action@v2
+      
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/app${{ matrix.executable-suffix }}
-          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
-          tag: ${{ github.ref }}
+          path: target/schedule
