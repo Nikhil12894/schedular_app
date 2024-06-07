@@ -1,8 +1,13 @@
 name: Artifacts native build and upload
 
 on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main" ]
   release:
     types: [published]
+
     
 defaults:
   run:
