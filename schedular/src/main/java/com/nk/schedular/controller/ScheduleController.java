@@ -24,6 +24,8 @@ import com.nk.schedular.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -96,6 +98,11 @@ public class ScheduleController {
     @Parameter(name = ApiConstants.PAGE_SIZE, description = "number of elements per page", in = ParameterIn.QUERY)
     @Parameter(name = ApiConstants.SORT_ORDER, description = "Order to sort in", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_ORDER)
     @Parameter(name = ApiConstants.SORT_BY, description = "value to sort by", in = ParameterIn.QUERY, example = ApiConstants.DEFAULT_SORT_CREATED)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All Schedules"),
+            @ApiResponse(responseCode = "400", description = "Not Found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/all")
     public ResponseEntity<WebResponse<ScheduleDTOList>> getAllSchedule(
             @RequestParam(value = ApiConstants.PAGE, required = false) Integer page,
@@ -108,7 +115,6 @@ public class ScheduleController {
         response.setMessage("Fetched Successfully !!");
         return ResponseEntity.ok(response);
     }
-
 
     /**
      * Get All Schedule with cron expression
@@ -160,28 +166,28 @@ public class ScheduleController {
         return ResponseEntity.ok(response);
     }
 
-
     /**
      * Retrieves all distinct cron expressions.
      *
-     * @return          A ResponseEntity containing a WebResponse with a list of distinct cron expressions and a success message.
+     * @return A ResponseEntity containing a WebResponse with a list of distinct
+     *         cron expressions and a success message.
      */
-     @Operation(summary = "Get all distinct cron expression")
-     @GetMapping(path = "/distinct-cron-expression")
-     public ResponseEntity<WebResponse<List<String>>> distinctCronExp() {
-         List<String> distinctCronExpression = scheduleService.getDistinctCronExpression();
-         WebResponse<List<String>> response = new WebResponse<>();
-         response.setData(distinctCronExpression);
-         response.setMessage(" Successfully !!");
-         return ResponseEntity.ok(response);
-     }
+    @Operation(summary = "Get all distinct cron expression")
+    @GetMapping(path = "/distinct-cron-expression")
+    public ResponseEntity<WebResponse<List<String>>> distinctCronExp() {
+        List<String> distinctCronExpression = scheduleService.getDistinctCronExpression();
+        WebResponse<List<String>> response = new WebResponse<>();
+        response.setData(distinctCronExpression);
+        response.setMessage(" Successfully !!");
+        return ResponseEntity.ok(response);
+    }
 
-
-  
     /**
-     * Retrieves all distinct cron expressions and returns them as a response entity.
+     * Retrieves all distinct cron expressions and returns them as a response
+     * entity.
      *
-     * @return          A ResponseEntity containing a WebResponse with a list of distinct cron expressions and a success message.
+     * @return A ResponseEntity containing a WebResponse with a list of distinct
+     *         cron expressions and a success message.
      */
     @Operation(summary = "Get all schedule ID")
     @GetMapping(path = "/all-schedule-id")
@@ -192,6 +198,5 @@ public class ScheduleController {
         response.setMessage(" Successfully !!");
         return ResponseEntity.ok(response);
     }
-
 
 }

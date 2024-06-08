@@ -3,8 +3,8 @@ name: Artifacts native build and upload
 on:
   push:
     branches: [ "dev" ]
-  release:
-    types: [published]
+  # release:
+  #   types: [published]
 
     
 defaults:
@@ -24,9 +24,9 @@ jobs:
           - os: macos-latest
             asset_name: macos-amd64
             executable-suffix: ''
-          - os: windows-latest
-            asset_name: windows-amd64
-            executable-suffix: '.exe'
+          # - os: windows-latest
+          #   asset_name: windows-amd64
+          #   executable-suffix: '.exe'
 
     steps:
       - name: Checkout repository
@@ -43,12 +43,9 @@ jobs:
           native-image-job-reports: 'true'
 
       - name: Build artifact
-        run: mvn -Pnative native:compile -DskipTests=true
+        run: ./mvnw -Pnative native:compile -DskipTests=true
       
-      - name: Upload artifact to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./target/schedule${{ matrix.executable-suffix }}
-          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
-          tag: ${{ github.ref }}
+          path: ‘${{ github.workspace }}/target/*
