@@ -1,10 +1,10 @@
 name: Artifacts native build and upload
 
 on:
-  push:
-    branches: [ "main" ]
-  # release:
-  #   types: [published]
+  # push:
+  #   branches: [ "main" ]
+  release:
+    types: [published]
 
     
 defaults:
@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
           draft: false
           prerelease: false
 
