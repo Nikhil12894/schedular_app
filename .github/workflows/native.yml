@@ -18,11 +18,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            asset_name: linux-amd64
-            executable-suffix: ''
+          # - os: ubuntu-latest 
+          #   asset_name: linux-amd64
+          #   executable-suffix: ''
           - os: macos-latest
-            asset_name: macos-amd64
+            asset_name: macos-m1
+            runner.arch: ARM64
             executable-suffix: ''
           # - os: windows-latest
           #   asset_name: windows-amd64
@@ -38,7 +39,6 @@ jobs:
           version: latest
           java-version: '21'
           distribution: 'graalvm'
-          components: native-image
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
 
