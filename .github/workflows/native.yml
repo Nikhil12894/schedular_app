@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: ubuntu-latest
-          #   asset_name: linux-amd64
-          #   executable-suffix: ''
+          - os: ubuntu-latest
+            asset_name: linux-amd64
+            executable-suffix: ''
           - os: macos-latest
             asset_name: macos-amd64
             executable-suffix: ''
@@ -50,37 +50,37 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build artifact
-        run: ./mvnw clean package -DskipTests=true #./mvnw -Pnative native:compile -DskipTests=true #./mvnw clean package -DskipTests=true
+        run: ./mvnw -Pnative native:compile -DskipTests=true #./mvnw clean package -DskipTests=true
       
       - name: Upload artifact for deployment job
         id: upload_release
         uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.os }}-${{ matrix.asset_name }}
-          path: ${{ github.workspace }}/schedular/target/
+          path: ${{ github.workspace }}/schedular/target/schedular
           overwrite: true
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
-          draft: false
-          prerelease: false
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
+      #     draft: false
+      #     prerelease: false
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}.zip
-          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}.zip
-          asset_content_type: application/zip
+      # - name: Upload Release Asset
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+      #     asset_path: ./${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}.zip
+      #     asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}.zip
+      #     asset_content_type: application/zip
       # - name: Upload artifact to release
       #   uses: svenstaro/upload-release-action@v2
       #   with:
