@@ -24,9 +24,9 @@ jobs:
           - os: macos-latest
             asset_name: macos-amd64
             executable-suffix: ''
-          - os: windows-latest
-            asset_name: windows-amd64
-            executable-suffix: '.exe'
+          # - os: windows-latest
+          #   asset_name: windows-amd64
+          #   executable-suffix: '.exe'
 
     steps:
       - name: Checkout repository
