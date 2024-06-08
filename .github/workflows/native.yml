@@ -18,15 +18,15 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: ubuntu-latest
-          #   asset_name: linux-amd64
-          #   executable-suffix: ''
+          - os: ubuntu-latest
+            asset_name: linux-amd64
+            executable-suffix: ''
           - os: macos-latest
             asset_name: macos-amd64
             executable-suffix: ''
-          # - os: windows-latest
-          #   asset_name: windows-amd64
-          #   executable-suffix: '.exe'
+          - os: windows-latest
+            asset_name: windows-amd64
+            executable-suffix: '.exe'
 
     steps:
       - name: Checkout repository
@@ -50,11 +50,13 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build artifact
-        run: ./mvnw clean package -DskipTests=true #./mvnw -Pnative native:compile -DskipTests=true
+        run: ./mvnw -Pnative native:compile -DskipTests=true #./mvnw clean package -DskipTests=true
       
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+
+      - name: Upload artifact to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          name: binary-${{ matrix.os }}-${{ matrix.asset_name }}
-          path: ${{ github.workspace }}/schedular/target/
-          overwrite: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/schedular/target/${{ matrix.executable-suffix }}
+          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
+          tag: ${{ github.ref }}
