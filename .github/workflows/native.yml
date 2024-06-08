@@ -21,8 +21,8 @@ jobs:
           - os: ubuntu-latest
             asset_name: linux-amd64
             executable-suffix: ''
-          - os: macos-latest
-            asset_name: macos-amd64
+          - os: macOS-14
+            asset_name: macos-amd64-m1
             executable-suffix: ''
           # - os: windows-latest
           #   asset_name: windows-amd64
