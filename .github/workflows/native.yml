@@ -1,6 +1,8 @@
 name: Artifacts native build and upload
 
 on:
+  # push:
+  #   branches: [ "dev" ]
   release:
     types: [published]
 
@@ -40,13 +42,21 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
 
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Build artifact
-        run: mvn -Pnative native:compile -DskipTests=true
+        run: ./mvnw -Pnative native:compile -DskipTests=true #./mvnw clean package -DskipTests=true
+      
 
       - name: Upload artifact to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/app${{ matrix.executable-suffix }}
+          file: ${{ github.workspace }}/schedular/target/${{ matrix.executable-suffix }}
           asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset_name }}${{ matrix.executable-suffix }}
           tag: ${{ github.ref }}
