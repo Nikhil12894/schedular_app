@@ -21,7 +21,7 @@ jobs:
           # - os: ubuntu-latest 
           #   asset_name: linux-amd64
           #   executable-suffix: ''
-          - os: macOS
+          - os: macos-latest
             asset_name: macos-m1
             runner.arch: ARM64
             executable-suffix: ''
