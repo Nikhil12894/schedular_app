@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            asset_name: linux-amd64
-            executable-suffix: ''
+          # - os: ubuntu-latest
+          #   asset_name: linux-amd64
+          #   executable-suffix: ''
           - os: macos-latest
             asset_name: macos-amd64
             executable-suffix: ''
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.os }}-${{ matrix.asset_name }}
-          path: ${{ github.workspace }}/schedular/target/schedular
+          path: ${{ github.workspace }}/schedular/target/
           overwrite: true
 
       - name: Create Release
