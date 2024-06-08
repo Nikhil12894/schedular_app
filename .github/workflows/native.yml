@@ -42,12 +42,19 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
 
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Build artifact
-        run: ./mvnw -Pnative native:compile -DskipTests=true
+        run: ./mvnw clean package -DskipTests=true #./mvnw -Pnative native:compile -DskipTests=true
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.os }}-${{ matrix.asset_name }}
-          path: ‘${{ github.workspace }}/schedular/target/schedular
+          path: ${{ github.workspace }}/schedular/target/
           overwrite: true
